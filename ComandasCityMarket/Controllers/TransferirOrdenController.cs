@@ -6,19 +6,15 @@ using System.Web.Mvc;
 
 namespace ComandasCityMarket.Controllers
 {
-    [HandleError]
-    public class HomeController : Controller
+    public class TransferirOrdenController : Controller
     {
+        //
+        // GET: /TransferirOrden/
+
         public ActionResult Index()
         {
-            ViewData["Message"] = "Welcome to ASP.NET MVC!";
-
             return View();
         }
 
-        public ActionResult About()
-        {
-            return View();
-        }
     }
 }

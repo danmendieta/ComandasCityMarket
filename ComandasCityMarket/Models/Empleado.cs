@@ -2,30 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Data;
-using System.Data.SqlClient;
+using System.Web.Mvc;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+
 namespace ComandasCityMarket.Models
 {
     [Serializable]
     [DataContract]
-    public class Alive
+    public class Empleado
     {
         [DataMember]
-        public bool success { set; get; }
+        public int empleado { set; get; }
         [DataMember]
-        public string message { set; get; }
+        public int contrasena { set; get; }
         [DataMember]
-        public string body { set; get; }
+        public int sucursal { set; get; }
+        [DataMember]
+        public JsonResult asasas { set; get; } 
     }
 
     [Serializable]
     [DataContract]
-    public class AliveRequest 
+    public class RespEmpleado : Respuesta
     {
         [DataMember]
-        public bool request { set; get; }
+        public List<Empleado> listaEmpleado { set; get; }
 
     }
+
 }

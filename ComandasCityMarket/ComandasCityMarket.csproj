@@ -34,6 +34,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Json.net\Bin\Net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -66,25 +69,35 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AliveController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\CategoriasArticulosController.cs" />
+    <Compile Include="Controllers\CerrarOrdenController.cs" />
+    <Compile Include="Controllers\ConsolidarOrdenController.cs" />
+    <Compile Include="Controllers\EntrarController.cs" />
+    <Compile Include="Controllers\NuevaComandaController.cs" />
+    <Compile Include="Controllers\NuevaOrdenController.cs" />
+    <Compile Include="Controllers\OrdenesActivasController.cs" />
+    <Compile Include="Controllers\SalirController.cs" />
+    <Compile Include="Controllers\TransferirOrdenController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="ModelBinders\ApiDefaultModelBinder.cs" />
-    <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\Alive.cs" />
+    <Compile Include="Models\Empleado.cs" />
+    <Compile Include="Models\Respuesta.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="SQL\ComandasCityMarket.sql" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\jquery-1.4.1.js" />

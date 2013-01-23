@@ -17,11 +17,64 @@ namespace ComandasCityMarket
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
-                "Default", // Route name
+                "Alive", // Route name
                 "{controller}/{action}", // URL with parameters
                 new { controller = "Alive", action = "Index" } // Parameter defaults
             );
 
+            routes.MapRoute(
+                "CategoriasArticulos",
+                "{controller}",
+                new { controller = "CategoriasArticulos", action = "Index" }
+            );
+
+            routes.MapRoute(
+                "CerrarOrden",
+                "{controller}",
+                new { controller = "CerrarOrden", action = "Index" }
+            );
+
+            routes.MapRoute(
+                "ConsolidarOrden",
+                "{controller}",
+                new { controller = "ConsolidarOrden", action = "Index" }
+            );
+            
+            routes.MapRoute(
+                "Entrar",
+                "{controller}",
+                new { controller = "Entrar", action = "Index" } // Parameter defaults
+            );
+
+            routes.MapRoute(
+                "NuevaComanda",
+                "{controller}/{action}",
+                new { controller = "NuevaComanda", action = "Index" } // Parameter defaults
+            );
+
+            routes.MapRoute(
+                "NuevaOrden",
+                "{controller}/{action}",
+                new { controller = "NuevaOrden", action = "Index" } // Parameter defaults
+            );
+
+            routes.MapRoute(
+                "OrdenesActivas",
+                "{controller}/{action}",
+                new { controller = "OrdenesActivas", action = "Index" } // Parameter defaults
+            );
+
+            routes.MapRoute(
+                "Salir",
+                "{controller}/{action}",
+                new { controller = "Salir", action = "Index" } // Parameter defaults
+            );
+
+            routes.MapRoute(
+                "TransferirOrden",
+                "{controller}/{action}",
+                new { controller = "TransferirOrden", action = "Index" } // Parameter defaults
+            );
         }
 
         protected void Application_Start()
