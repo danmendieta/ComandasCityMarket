@@ -84,6 +84,7 @@
     </Compile>
     <Compile Include="ModelBinders\ApiDefaultModelBinder.cs" />
     <Compile Include="Models\Alive.cs" />
+    <Compile Include="Models\Catalogo.cs" />
     <Compile Include="Models\Empleado.cs" />
     <Compile Include="Models\Respuesta.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

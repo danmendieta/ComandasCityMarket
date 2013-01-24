@@ -19,8 +19,6 @@ namespace ComandasCityMarket.Models
         public List<Modificador> modificadores { set; get; }
     }
 
-
-
     [Serializable]
     [DataContract]
     public class Categoria {
