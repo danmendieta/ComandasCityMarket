@@ -31,24 +31,35 @@ namespace ComandasCityMarket.Controllers
         public ActionResult Index(AliveRequest aliv)
         {
             Alive res = new Alive();
+            SqlDataReader reader = null;
+            SqlConnection myConnection = new SqlConnection();
             try
             {
-                SqlDataReader reader = null;
-                SqlConnection myConnection = new SqlConnection();
+                
                 myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                 myConnection.Open();
                 SqlCommand command = new SqlCommand("select * from ff_cat_usuario", myConnection);
                 reader = command.ExecuteReader();
-
-                while(reader.Read()){
-                    res.body +=" | " + reader["usr_nombre"].ToString();
+                List<Empleado> listaEmpl = new List<Empleado>();
+                while (reader.Read())
+                {
+                    Empleado emp = new Empleado();
+                    emp.empl_nom = reader["usr_nombre"].ToString();
+                    listaEmpl.Add(emp);
                 }//end while
-            }catch(SqlException e)
+                res.body = listaEmpl;
+            }
+            catch (SqlException e)
             {
                 res.success = false;
-                res.message = "ERROR DB "+e.Message;
+                res.message = "ERROR DB " + e.Message;
                 return Json(res);
-            }            
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+          
             if (aliv.request)
             {
                 res.success = true;

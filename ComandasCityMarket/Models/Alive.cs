@@ -17,7 +17,7 @@ namespace ComandasCityMarket.Models
         [DataMember]
         public string message { set; get; }
         [DataMember]
-        public string body { set; get; }
+        public List<Empleado> body { set; get; }
     }
 
     [Serializable]

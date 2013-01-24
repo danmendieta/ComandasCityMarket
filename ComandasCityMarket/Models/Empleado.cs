@@ -12,13 +12,15 @@ namespace ComandasCityMarket.Models
     public class Empleado
     {
         [DataMember]
-        public int empleado { set; get; }
+        public int empl_cod { set; get; }
+        [DataMember]
+        public string empl_nom { set; get; }
         [DataMember]
         public int contrasena { set; get; }
         [DataMember]
         public int sucursal { set; get; }
-        [DataMember]
-        public JsonResult asasas { set; get; } 
+        //[DataMember]
+        //public JsonResult testJSON { set; get; } 
     }
 
     [Serializable]
