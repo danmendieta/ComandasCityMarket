@@ -22,10 +22,12 @@ namespace ComandasCityMarket
                 new { controller = "Alive", action = "Index" } // Parameter defaults
             );
 
+
+
             routes.MapRoute(
-                "CategoriasArticulos",
+                "Catalogo",
                 "{controller}",
-                new { controller = "CategoriasArticulos", action = "Index" }
+                new { controller = "Catalogo", action = "Index" }
             );
 
             routes.MapRoute(
@@ -47,6 +49,12 @@ namespace ComandasCityMarket
             );
 
             routes.MapRoute(
+                "Mesas",
+                "{controller}/{action}",
+                new { controller = "Mesas", action = "Index" } // Parameter defaults
+            );
+
+            routes.MapRoute(
                 "NuevaComanda",
                 "{controller}/{action}",
                 new { controller = "NuevaComanda", action = "Index" } // Parameter defaults
@@ -65,6 +73,12 @@ namespace ComandasCityMarket
             );
 
             routes.MapRoute(
+                "Restaurantes",
+                "{controller}/{action}",
+                new { controller = "Restaurantes", action = "Index" } // Parameter defaults
+            );
+
+            routes.MapRoute(
                 "Salir",
                 "{controller}/{action}",
                 new { controller = "Salir", action = "Index" } // Parameter defaults
@@ -75,6 +89,15 @@ namespace ComandasCityMarket
                 "{controller}/{action}",
                 new { controller = "TransferirOrden", action = "Index" } // Parameter defaults
             );
+
+
+            routes.MapRoute(
+                "AdminWeb/Restaurante",
+                "{controller}/{action}",
+                new { controller = "Adminweb", action = "Index" } // Parameter defaults
+            );
+
+
         }
 
         protected void Application_Start()

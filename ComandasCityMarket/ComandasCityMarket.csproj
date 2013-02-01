@@ -34,9 +34,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\Json.net\Bin\Net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -69,24 +66,31 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\AdminwebController.cs" />
     <Compile Include="Controllers\AliveController.cs" />
-    <Compile Include="Controllers\CategoriasArticulosController.cs" />
+    <Compile Include="Controllers\CatalogoController.cs" />
     <Compile Include="Controllers\CerrarOrdenController.cs" />
     <Compile Include="Controllers\ConsolidarOrdenController.cs" />
     <Compile Include="Controllers\EntrarController.cs" />
+    <Compile Include="Controllers\MesasController.cs" />
     <Compile Include="Controllers\NuevaComandaController.cs" />
     <Compile Include="Controllers\NuevaOrdenController.cs" />
     <Compile Include="Controllers\OrdenesActivasController.cs" />
+    <Compile Include="Controllers\RestaurantesController.cs" />
     <Compile Include="Controllers\SalirController.cs" />
     <Compile Include="Controllers\TransferirOrdenController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="ModelBinders\ApiDefaultModelBinder.cs" />
+    <Compile Include="Models\Acceso.cs" />
     <Compile Include="Models\Alive.cs" />
     <Compile Include="Models\Catalogo.cs" />
     <Compile Include="Models\Empleado.cs" />
+    <Compile Include="Models\Mesa.cs" />
+    <Compile Include="Models\OrdenActiva.cs" />
     <Compile Include="Models\Respuesta.cs" />
+    <Compile Include="Models\Restaurant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -146,12 +150,11 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>False</UseIIS>
+          <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>3718</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>
-          </IISUrl>
+          <IISUrl>http://localhost/ComandasCityMarket</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

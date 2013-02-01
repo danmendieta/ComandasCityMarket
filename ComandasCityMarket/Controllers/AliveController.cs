@@ -8,8 +8,6 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Runtime.Serialization.Json;
 using ComandasCityMarket.Models;
-
-using Newtonsoft.Json;
 namespace ComandasCityMarket.Controllers
 {
     public class AliveController : Controller

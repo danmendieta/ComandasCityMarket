@@ -2,30 +2,27 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Data;
-using System.Data.SqlClient;
+using System.Web.Mvc;
 using System.Runtime.Serialization;
 
 namespace ComandasCityMarket.Models
 {
     [Serializable]
     [DataContract]
-    public class Alive
+    public class Acceso
     {
         [DataMember]
-        public bool success { set; get; }
+        public int num_empleado { set; get; }
         [DataMember]
-        public string message { set; get; }
-        [DataMember]
-        public List<Empleado> body { set; get; }
+        public int rest_id { set; get; }
     }
-
     [Serializable]
     [DataContract]
-    public class AliveRequest 
+    public class RespAcceso : Respuesta
     {
         [DataMember]
-        public bool request { set; get; }
-
+        public Empleado empleado { set; get; }
+        [DataMember]
+        public Restaurant restaurant { set; get; }
     }
 }
