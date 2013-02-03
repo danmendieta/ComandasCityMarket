@@ -33,4 +33,34 @@ namespace ComandasCityMarket.Models
         public List<Mesa> mesas { set; get; }
     }
 
+    [Serializable]
+    [DataContract]
+    public class NewMesa
+    {
+        [DataMember]
+        public string mesa_cve { set; get; }
+        [DataMember]
+        public string mesa_des { set; get; }
+        [DataMember]
+        public int rest_id { set; get; }
+        [DataMember]
+        public int ubic_consec { set; get; }
+    }
+    [Serializable]
+    [DataContract]
+    public class IdentifMesa
+    {
+        [DataMember]
+        public int mesa_id { set; get; }
+    }
+
+    [Serializable]
+    [DataContract]
+    public class ReqMesa
+    {
+        [DataMember]
+        public int rest_id { set; get; }
+        [DataMember]
+        public int ubic_consec { set; get; }
+    }
 }

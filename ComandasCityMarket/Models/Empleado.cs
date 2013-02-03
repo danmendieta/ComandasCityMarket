@@ -25,11 +25,8 @@ namespace ComandasCityMarket.Models
         public string empl_tipo { set; get; }
         [DataMember]
         public int succ_id { set; get; }
-        //public int contrasena { set; get; }
         [DataMember]
         public int sucursal { set; get; }
-        //[DataMember]
-        //public JsonResult testJSON { set; get; } 
     }
 
     [Serializable]
@@ -37,7 +34,7 @@ namespace ComandasCityMarket.Models
     public class RespEmpleado : Respuesta
     {
         [DataMember]
-        public List<Empleado> listaEmpleado { set; get; }
+        public List<Empleado> listaEmpleados { set; get; }
 
     }
 
@@ -46,7 +43,35 @@ namespace ComandasCityMarket.Models
     public class ReqEmpleado
     {
         [DataMember]
-        public int num_empleado { set; get; }
+        public int empl_cod { set; get; }
+    }
+
+
+    [Serializable]
+    [DataContract]
+    public class ReqEmpleados
+    {
+        [DataMember]
+        public int succ_id { set; get; }
+    }
+
+
+
+    public class NuevoEmpleado
+    {
+        [DataMember]
+        public int empl_cod { set; get; }
+        [DataMember]
+        public string empl_nom { set; get; }
+        [DataMember]
+        public string empl_app { set; get; }
+        [DataMember]
+        public string empl_apm { set; get; }
+        [DataMember]
+        public string empl_tipo { set; get; }
+        [DataMember]
+        public int succ_id { set; get; }
+        
     }
 
 }

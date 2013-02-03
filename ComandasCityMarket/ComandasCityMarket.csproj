@@ -87,10 +87,14 @@
     <Compile Include="Models\Alive.cs" />
     <Compile Include="Models\Catalogo.cs" />
     <Compile Include="Models\Empleado.cs" />
+    <Compile Include="Models\Impresora.cs" />
     <Compile Include="Models\Mesa.cs" />
     <Compile Include="Models\OrdenActiva.cs" />
     <Compile Include="Models\Respuesta.cs" />
     <Compile Include="Models\Restaurant.cs" />
+    <Compile Include="Models\Sucursal.cs" />
+    <Compile Include="Models\TipoProducto.cs" />
+    <Compile Include="Models\Ubicacion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -154,11 +158,10 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>3718</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost/ComandasCityMarket</IISUrl>
+          <IISUrl>http://127.0.0.1/ComandasCityMarket</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <CustomServerUrl>http://192.168.1.85/ComandasCityMarket</CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

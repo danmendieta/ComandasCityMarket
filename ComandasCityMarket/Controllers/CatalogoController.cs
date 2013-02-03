@@ -37,7 +37,7 @@ namespace ComandasCityMarket.Controllers
                     while (reader.Read())
                     {
                         Categoria categoria = new Categoria();
-                        List<Articulo> listArticulos = new List<Articulo>();
+                        
                         List<Modificador> listaModificadores = new List<Modificador>();
                         categoria.agru_des = reader["agru_des"].ToString();
                         categoria.agru_desc = reader["agru_desc"].ToString();
@@ -46,7 +46,8 @@ namespace ComandasCityMarket.Controllers
                         categoria.agru_tipo = Convert.ToInt32(reader["agru_tipo"].ToString());
                         if(categoria.agru_tipo == 1){
                             categoria.hasSubCat = true;
-                            SqlCommand commandFindSub = new SqlCommand("SELECT * FROM AGRUPACION_CAT WHERE AGRU_TIPO = 1 AND AGRU_PADRE = "+categoria.agru_padre, myConnection);
+                            //SqlCommand commandFindSub = new SqlCommand("SELECT * FROM AGRUPACION_CAT WHERE AGRU_TIPO = 1 AND AGRU_PADRE = "+categoria.agru_padre, myConnection);
+                            SqlCommand commandFindSub = new SqlCommand("SELECT * FROM AGRUPACION_CAT WHERE AGRU_PADRE = " + categoria.agru_id, myConnection);
                             SqlDataReader readerSub = commandFindSub.ExecuteReader();
                             List<SubCategoria> listasubCateg = new List<SubCategoria>();                            
                             while(readerSub.Read()){
@@ -57,7 +58,8 @@ namespace ComandasCityMarket.Controllers
                                 subCat.agru_padre = Convert.ToInt32(readerSub["agru_padre"].ToString());
                                 subCat.agru_tipo = Convert.ToInt32(readerSub["agru_tipo"].ToString());
                                 SqlCommand commandFindSubArt = new SqlCommand("SELECT A.AGRU_ID, A.ART_DES, A.ART_DESC, A.ART_EAN, A.TIPP_ID, B.ART_PRECIO FROM ARTICULO A, ARTICULO_PRECIO B WHERE  A.AGRU_ID = "+subCat.agru_id +" AND B.ART_EAN = A.ART_EAN AND B.SUCC_ID ="+reqCatalogo.succ_id, myConnection);
-                                SqlDataReader readerSubArt = commandFindSubArt.ExecuteReader();                                
+                                SqlDataReader readerSubArt = commandFindSubArt.ExecuteReader();
+                                List<Articulo> listArticulos = new List<Articulo>();
                                 while(readerSubArt.Read()){
                                     Articulo articulo = new Articulo();
                                     articulo.agru_id = Convert.ToInt32(readerSubArt["agru_id"].ToString());
@@ -87,6 +89,7 @@ namespace ComandasCityMarket.Controllers
                             categoria.hasSubCat = false;
                             SqlCommand commandFindArt = new SqlCommand("SELECT A.AGRU_ID, A.ART_DES, A.ART_DESC, A.ART_EAN, A.TIPP_ID, B.ART_PRECIO FROM ARTICULO A, ARTICULO_PRECIO B WHERE  A.AGRU_ID = " + categoria.agru_id + " AND B.ART_EAN = A.ART_EAN AND B.SUCC_ID =" + reqCatalogo.succ_id, myConnection);
                             SqlDataReader readerArt = commandFindArt.ExecuteReader();
+                            List<Articulo> listArticulos = new List<Articulo>();
                             while (readerArt.Read())
                             {
                                 Articulo articulo = new Articulo();
@@ -119,7 +122,7 @@ namespace ComandasCityMarket.Controllers
                 catch (SqlException exCat)
                 {   
                     catalogo.success = false;
-                    catalogo.message = "ERROR " + exCat.Message;
+                    catalogo.message = "ERROR 122" + exCat.Message;
                     return Json(catalogo);
                 }
                 /*
@@ -165,7 +168,7 @@ namespace ComandasCityMarket.Controllers
                  */
             }catch(Exception e){
                 catalogo.success = false;//En caso de caer en exception el estado del boleano se envia en falso y en message el detalle del error
-                catalogo.message = "ERROR " + e.Message;
+                catalogo.message = "ERROR 168 " + e.Message;
                 return Json(catalogo);
             }finally{
                 myConnection.Close();//Cerrando dentro del finally la conexión realizada a la base de datos                
@@ -174,15 +177,6 @@ namespace ComandasCityMarket.Controllers
             catalogo.message = "OK";
             return Json(catalogo);
         }//end Index
-
-
-        public List<SubCategoria> buscaSubCategorias(int categoriaPadre) {
-            return null;
-        }
-        public List<Articulo> buscaArticulo(int categoria)
-        {
-            return null;
-        }
 
     }//end class Controller
 }//End namespace

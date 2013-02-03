@@ -10,45 +10,49 @@ namespace ComandasCityMarket.Models
 {
     [Serializable]
     [DataContract]
-    public class Restaurant
+    public class Ubicacion
     {
         [DataMember]
         public int rest_id { set; get; }
         [DataMember]
-        public string rest_des { set; get; }
+        public int ubic_consec { set; get; }
         [DataMember]
-        public int succ_id { set; get; }
+        public string ubic_des { set; get; }
     }
 
     [Serializable]
     [DataContract]
-    public class RespRestaurant : Respuesta {
-        [DataMember]
-        public List<Restaurant> restaurantes { set; get; }
-    }
-    [Serializable]
-    [DataContract]
-    public class ReqGetRestaurant
+    public class ReferenceUbicacion
     {
         [DataMember]
-        public int succ_id { set; get; }
+        public int rest_id { set; get; }
+        [DataMember]
+        public int ubic_consec { set; get; }        
     }
 
     [Serializable]
     [DataContract]
-    public class ReqDeleteRestaurant
+    public class NewUbicacion
+    {
+        [DataMember]
+        public string ubic_des { set; get; }
+        [DataMember]
+        public int rest_id { set; get; }
+    }
+
+    [Serializable]
+    [DataContract]
+    public class ReqUbicacion
     {
         [DataMember]
         public int rest_id { set; get; }
     }
-        
+
     [Serializable]
     [DataContract]
-    public class ReqNewRestaurant
+    public class Ubicaciones : Respuesta
     {
         [DataMember]
-        public string rest_des { set; get; }
-        [DataMember]
-        public int succ_id { set; get; }
+        public List<Ubicacion> ubicaciones { set; get; }
     }
 }

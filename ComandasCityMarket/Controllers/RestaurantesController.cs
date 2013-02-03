@@ -26,7 +26,7 @@ namespace ComandasCityMarket.Controllers
                 {
                     myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                     myConnection.Open();
-                    SqlCommand command = new SqlCommand("select a.* from RESTAURANT a, EMPLEADO b where b.EMPL_COD = " + req.num_empleado + " and b.SUCC_ID = a.SUCC_ID and b.EMPL_STAT ='ALTA';  ", myConnection);
+                    SqlCommand command = new SqlCommand("select a.* from RESTAURANT a, EMPLEADO b where b.EMPL_COD = " + req.empl_cod + " and b.SUCC_ID = a.SUCC_ID and b.EMPL_STAT ='ALTA';  ", myConnection);
                     reader = command.ExecuteReader();
                     List<Restaurant> listaRestaurantes = new List<Restaurant>();
                     while(reader.Read()){

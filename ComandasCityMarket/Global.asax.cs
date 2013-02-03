@@ -22,8 +22,6 @@ namespace ComandasCityMarket
                 new { controller = "Alive", action = "Index" } // Parameter defaults
             );
 
-
-
             routes.MapRoute(
                 "Catalogo",
                 "{controller}",
@@ -90,12 +88,13 @@ namespace ComandasCityMarket
                 new { controller = "TransferirOrden", action = "Index" } // Parameter defaults
             );
 
-
+            /*
             routes.MapRoute(
-                "AdminWeb/Restaurante",
-                "{controller}/{action}",
-                new { controller = "Adminweb", action = "Index" } // Parameter defaults
+                "Adminweb",
+                "AdminwebRestaurante",
+                new { controller = "Alive", action = "Index" } // Parameter defaults
             );
+            */
 
 
         }
