@@ -407,12 +407,18 @@ RESPUESTA=
 
 ========================= 		IMPRESORAS 	   	=========================
 >NUEVA IMPRESORA
+newImpresora
+
 
 
 >ELIMINAR IMPRESORA
+deleteImpresora
 
 
 >ACTUALIZA IMPRESORA
+updateImpresora
 
 
 >GET IMPRESORAS
+getImpresoras
+
