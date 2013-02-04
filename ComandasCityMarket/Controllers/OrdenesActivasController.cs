@@ -15,7 +15,7 @@ namespace ComandasCityMarket.Controllers
     {
         //
         // GET: /OrdenesActivas/
-
+        [HttpPost]
         public ActionResult Index(Acceso acceso)
         {
             RespOrdenesActivas ordenesActivas = new RespOrdenesActivas();

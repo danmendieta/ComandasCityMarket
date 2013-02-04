@@ -85,6 +85,7 @@
   <ItemGroup>
     <Compile Include="Controllers\AdminwebController.cs" />
     <Compile Include="Controllers\AliveController.cs" />
+    <Compile Include="Controllers\AppMovilController.cs" />
     <Compile Include="Controllers\CatalogoController.cs" />
     <Compile Include="Controllers\CerrarOrdenController.cs" />
     <Compile Include="Controllers\ConsolidarOrdenController.cs" />
@@ -116,7 +117,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>

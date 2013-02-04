@@ -25,8 +25,8 @@ namespace ComandasCityMarket.Models
         public string empl_tipo { set; get; }
         [DataMember]
         public int succ_id { set; get; }
-        [DataMember]
-        public int sucursal { set; get; }
+        //[DataMember]
+        //public int sucursal { set; get; }
     }
 
     [Serializable]

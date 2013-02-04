@@ -66,7 +66,7 @@ namespace ComandasCityMarket.Controllers
             respuesta.success = true;
             respuesta.message = "OK";
             return Json(respuesta);
-        }
+        }//END ENTRAR
 
     }
 }

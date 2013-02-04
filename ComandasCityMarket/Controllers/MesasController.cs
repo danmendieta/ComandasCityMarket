@@ -52,7 +52,7 @@ namespace ComandasCityMarket.Controllers
             mesas.success = true;
             mesas.message = "OK";
             return Json(mesas);
-        }
+        }//END GETMESAS
 
     }
 }
