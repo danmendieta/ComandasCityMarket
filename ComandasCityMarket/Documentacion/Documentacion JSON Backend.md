@@ -742,9 +742,26 @@ RESPUESTA
 }
 
 
-localhost/ComandasCityMarket/AppMovil/
+========================= 		ORDENES 	   	=========================
+>GET RESTAURANTES
+localhost/ComandasCityMarket/AppMovil/getRestaurantes
+PARAMETROS
+{
+	"empl_cod":1234
+}
 
-
+RESPUESTA
+{
+	"success": true,
+    "message": "OK",
+    "restaurantes":[
+    				{
+    					"rest_id":1,
+    					"rest_des":"PINXOS",
+    					"succ_id":360
+    				}
+    ]
+}
 
 
 localhost/ComandasCityMarket/AppMovil/

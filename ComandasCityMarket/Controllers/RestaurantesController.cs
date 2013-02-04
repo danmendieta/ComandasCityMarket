@@ -48,7 +48,6 @@ namespace ComandasCityMarket.Controllers
                     respuestaRestaurantes.success = false;
                     respuestaRestaurantes.message += "ERROR " + exc.Message;
                     return Json(respuestaRestaurantes);
-
                 }
                 finally
                 {                    
@@ -62,7 +61,7 @@ namespace ComandasCityMarket.Controllers
             respuestaRestaurantes.success = true;
             respuestaRestaurantes.message += "OK";
             return Json(respuestaRestaurantes);
-        }//fin Index
+        }//fin GETRESTAURANTES
 
     }//fin class
 }//fin namespace
