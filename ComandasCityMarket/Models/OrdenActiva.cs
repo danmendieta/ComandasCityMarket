@@ -28,13 +28,33 @@ namespace ComandasCityMarket.Models
         public int ordn_hmov {set; get;}//ORDEN_CTRL.ordn_hmov
         
     }
-
+    [Serializable]
+    [DataContract]
     public class RespOrdenesActivas : Respuesta
     {
         [DataMember]
         public int total_ordenes { set; get; }
         [DataMember]
         public List<OrdenActiva> ordenesActivas { set; get; }
+    }
+    [Serializable]
+    [DataContract]
+    public class OrdenDescripcionCorta
+    {
+        [DataMember]
+        public int empl_cod { set; get; }
+        [DataMember]
+        public string empl_nom {set; get;}
+        [DataMember]
+        public int ordn_nctas { set; get; }
+    }
+
+    [Serializable]
+    [DataContract]
+    public class RespOrdenDescripcionCorta : Respuesta
+    {
+        [DataMember]
+        public List<OrdenDescripcionCorta> ordenes_rest { set; get; }
     }
 
 }

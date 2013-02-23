@@ -396,12 +396,14 @@ namespace ComandasCityMarket.Controllers
             {
                 empleados.success = false;
                 empleados.message = "ERROR " + ex.Message;
-
+                return Json(empleados);
             }
             finally
             {
                 myConnection.Close();
             }
+            empleados.success = true;
+            empleados.message = "OK";
             return Json(empleados);
         }
 
@@ -549,7 +551,6 @@ namespace ComandasCityMarket.Controllers
             }
             return Json(resp);
         }//END UPDATEUBICACION
-
 
         [HttpPost]
         public ActionResult deleteUbicacion(ReferenceUbicacion ubicacion)
@@ -701,7 +702,6 @@ namespace ComandasCityMarket.Controllers
             return Json(resp);
         }//END UPDATE MESA
 
-
         [HttpPost]
         public ActionResult getMesas(ReqMesa reqMesa)
         {
@@ -729,6 +729,9 @@ namespace ComandasCityMarket.Controllers
                     listaMesas.Add(mesa);
                 }
                 mesas.mesas = listaMesas;
+                mesas.success = true;
+                mesas.message = "OK ";
+
             }
             catch (Exception ex)
             {
@@ -781,7 +784,7 @@ namespace ComandasCityMarket.Controllers
         }//END GETTIPOPRODUCTOS
 
         [HttpPost]
-        public ActionResult newImpresora(Impresora impr)
+        public ActionResult newImpresora(NewImpresora impr)
         {
             Respuesta resp = new Respuesta();
             SqlConnection myConnection = new SqlConnection();
@@ -794,7 +797,7 @@ namespace ComandasCityMarket.Controllers
                 command.Parameters.AddWithValue("@DES", impr.impr_des);
                 command.Parameters.AddWithValue("@REST", impr.rest_id);
                 command.Parameters.AddWithValue("@TIPP", impr.tipp_id);
-                command.Parameters.AddWithValue("@CONSEC", impr.impr_conf);
+                command.Parameters.AddWithValue("@CONSEC", impr.ubic_consec);
                 if (0 < command.ExecuteNonQuery())
                 {
                     resp.success = true;
@@ -818,7 +821,6 @@ namespace ComandasCityMarket.Controllers
             }
             return Json(resp);
         }
-
 
         [HttpPost]
         public ActionResult deleteImpresora(RefImpresora refImpresora)
@@ -855,7 +857,6 @@ namespace ComandasCityMarket.Controllers
             }
             return Json(resp);
         }
-
 
         [HttpPost]
         public ActionResult updateImpresora(Impresora impresora)
@@ -896,7 +897,6 @@ namespace ComandasCityMarket.Controllers
             }
             return Json(resp);
         }
-
 
         [HttpPost]
         public ActionResult getImpresoras()
@@ -939,11 +939,6 @@ namespace ComandasCityMarket.Controllers
             impresoras.message = "OK";
             return Json(impresoras);
         }//END GET IMPRESORAS
-
-
-
-
-
 
 
 

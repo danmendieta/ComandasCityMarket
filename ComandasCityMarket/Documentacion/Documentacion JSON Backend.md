@@ -406,23 +406,77 @@ RESPUESTA=
 }
 
 ========================= 		IMPRESORAS 	   	=========================
-
 >NUEVA IMPRESORA
-newImpresora
+localhost/ComandasCityMarket/Adminweb/newImpresora
+PARAM
+{
+    "impr_des":"IMPRESORA A",
+    "impr_conf":"CONFIG",
+    "rest_id":1,
+    "ubic_consec":1,
+    "tipp_id":1
+}
+
+RESPUESTA 
+{
+    "success": true,
+    "message": "OK"    
+}
 
 
 
 >ELIMINAR IMPRESORA
-deleteImpresora
-ACTUALIZA
+localhost/ComandasCityMarket/Adminweb/deleteImpresora
+PARAMS
+{
+    "impr_id":1
+}
+RESPUESTA 
+{
+    "success": true,
+    "message": "OK"    
+}
 
-> IMPRESORA
-updateImpresora
+>ACTUALIZA IMPRESORA
+localhost/ComandasCityMarket/Adminweb/updateImpresora
+PARAMS
+{
+    "impr_id"
+}
+RESPUESTA
+{
+    "impr_id":1,
+    "impr_des":"IMPRESORA A",
+    "impr_conf":"CONFIG",
+    "impr_stat":"ALTA",
+    "rest_id":1,
+    "ubic_consec":1,
+    "tipp_id":1
+}
 
 
 >GET IMPRESORAS
-getImpresoras
-
+localhost/ComandasCityMarket/Adminweb/getImpresoras
+PARAMS
+{
+    //SIN PARAMS
+}
+RESPUESTA 
+{
+    "success": true,
+    "message": "OK",
+    "impresoras": [
+                    {
+                        "impr_id":1,
+                        "impr_des":"IMPRESORA A",
+                        "impr_conf":"CONFIG",
+                        "impr_stat":"ALTA",
+                        "rest_id":1,
+                        "ubic_consec":1,
+                        "tipp_id":1
+                    }
+                ]    
+}
 
 ========================= 		CATALOGO 	   	=========================
 >GET CATALOGO
@@ -715,34 +769,9 @@ RESPUESTA
     		]
 }
 
-========================= 		ORDENES 	   	=========================
->GET ORDENES ACTIVAS
-localhost/ComandasCityMarket/AppMovil/getOrdenesActivas
-PARAMETROS
-{
-	"num_empleado":78909,
-	"rest_id":1
-}
-RESPUESTA
-{
-	"success": true,
-    "message": "OK",
-    "total_ordenes":3,
-    "ordenesActivas":[
-    					{
-    						"ordn_id":4,
-    						"ordn_nper":2,
-    						"ordn_imptot":45.00,
-    						"ordn_stat":"ALTA",
-    						"mesa_id":1,
-    						"mesa_cve":"1A",
-    						"ordn_hmov":1430
-    					}
-    				]
-}
 
 
-========================= 		ORDENES 	   	=========================
+========================= 		RESTAURANT 	   	=========================
 >GET RESTAURANTES
 localhost/ComandasCityMarket/AppMovil/getRestaurantes
 PARAMETROS
@@ -764,4 +793,108 @@ RESPUESTA
 }
 
 
+=========================       ORDENES    =========================
+
+>NEW ORDEN
+localhost/ComandasCityMarket/AppMovil/newOrden
+PARAMETROS
+{
+    "ordn_nper":2,
+    "mesa_id":1,
+    "ordn_mese":2,
+    "ordn_obsv":"observaciones de la orden"
+}
+
+RESPUESTA
+{
+    "success": true,
+    "message": "OK"
+}
+
+>GET ORDENES ACTIVAS
+localhost/ComandasCityMarket/AppMovil/getOrdenesActivas
+PARAMETROS
+{
+    "num_empleado":78909,
+    "rest_id":1
+}
+RESPUESTA
+{
+    "success": true,
+    "message": "OK",
+    "total_ordenes":3,
+    "ordenesActivas":[
+                        {
+                            "ordn_id":4,
+                            "ordn_nper":2,
+                            "ordn_imptot":45.00,
+                            "ordn_stat":"ALTA",
+                            "mesa_id":1,
+                            "mesa_cve":"1A",
+                            "ordn_hmov":1430
+                        }
+                    ]
+}
+
+=========================       COMANDAS    =========================
+localhost/ComandasCityMarket/AppMovil/newComanda
+PARAMS
+{
+    "ordn_id":1,
+    "coma_obsv":"obsV comanda",
+    "ordenarticulo":[
+                        {
+                            "art_ean":098808,
+                            "ordn_cant":2,
+                            "ordn_impuni":12.5,
+                            "ordn_impuni":25.0,
+                            "ordn_obsv":"TOQUE LIMON",
+                            "hasModif":false,
+                            "agru_id":0,  //SOLO SI hasModif es false meter valor 0
+                            "agru_consec":0//SOLO SI hasModif es false meter valor 0
+                        },
+                        {
+                            "art_ean":023448,
+                            "ordn_cant":1,
+                            "ordn_impuni":134.,
+                            "ordn_impuni":134.0,
+                            "ordn_obsv":"sin sal",
+                            "hasModif":true,
+                            "agru_id":4,
+                            "agru_consec":2
+                        }
+                    ]
+}
+
+
+
+
+
+=========================       RESTO ORDENES    =========================
+localhost/ComandasCityMarket/AppMovil/getRestoOrdenes
+
+
+PARAMS
+{
+    "rest_id":1
+}
+
+RESPUESTA
+{
+    "success": true,
+    "message": "OK",
+    "ordenes_rest":[
+                        "ordn_id":1,
+                        "empl_nom":"Jorge Arenas",
+                        "mesa_cve": 1,
+                        "ordn_imptot":0.0,
+                        "ordn_nper":4
+                    ]
+}
+
+
+
+
 localhost/ComandasCityMarket/AppMovil/
+
+

@@ -28,6 +28,22 @@ namespace ComandasCityMarket.Models
     }
     [Serializable]
     [DataContract]
+    public class NewImpresora
+    {
+        [DataMember]
+        public string impr_des { set; get; }
+        [DataMember]
+        public string impr_conf { set; get; }
+        [DataMember]
+        public int rest_id { set; get; }
+        [DataMember]
+        public int ubic_consec { set; get; }
+        [DataMember]
+        public int tipp_id { set; get; }
+    }
+
+    [Serializable]
+    [DataContract]
     public class RefImpresora
     {
         [DataMember]

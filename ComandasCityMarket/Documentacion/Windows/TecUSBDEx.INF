@@ -1,0 +1,143 @@
+;
+; TEC USBD Setup INF file ver 1.0
+;
+;
+;
+;V001.006
+; TRST-A1x-CN + DENSO GT10B Wireless Scanner(BA10-RKU) 統合版
+;
+[Version]
+Signature="$CHICAGO$"
+Class=TECUSBD
+ClassGUID={CE2456E6-F9A9-4102-ABF4-2468DB708044}
+provider=%TOSHIBA_TEC%
+DriverVer=01/17/2000,1.0.0.1 
+
+[ClassInstall]
+Addreg=USBClassReg
+
+[ClassInstall32]
+Addreg=USBClassReg
+
+[USBClassReg]
+HKR,,,,%TECUSBDClassName%
+HKR,,Icon,,-20
+
+[Manufacturer]
+%TECMfg%=TOSHIBA_TEC
+
+[TOSHIBA_TEC]
+;新しいデバイスを追加する場合はこの下に追加するデバイスの
+;Vendor ID,Product IDを調べ例にならって記述する。複数行記述可。
+;これに対応して[Strings]セクションも変更すること
+
+%USB\VID_08A6&PID_0001.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_0001
+%USB\VID_08A6&PID_0006.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_0006
+%USB\VID_08A6&PID_000A.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_000A
+%USB\VID_08A6&PID_000B.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_000B
+%USB\VID_08A6&PID_000C&MI_01.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_000C&MI_01
+%USB\VID_08A6&PID_000D&MI_00.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_000D&MI_00
+%USB\VID_08A6&PID_000D&MI_01.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_000D&MI_01
+%USB\VID_08A6&PID_0016.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_0016
+%USB\VID_08A6&PID_0017.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_0017
+%USB\VID_08A6&PID_0020&MI_00.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_0020&MI_00
+%USB\VID_08A6&PID_0020&MI_02.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_0020&MI_02
+%USB\VID_08A6&PID_0020&MI_03.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_0020&MI_03
+%USB\VID_08A6&PID_0031.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_0031
+%USB\VID_08A6&PID_0036.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_0036
+%USB\VID_08A6&PID_0037.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_0037
+%USB\VID_08A6&PID_003D.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_003D
+%USB\VID_08A6&PID_003F.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_003F
+%USB\VID_08A6&PID_0046.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_0046
+;TEC TRST-A00 USB POS Printer
+%USB\VID_08A6&PID_0052.DeviceDesc%=TECUSBD.Dev, USB\VID_08A6&PID_0052
+;Symbol Barcode Scanner
+%USB\VID_05E0&PID_1200.DeviceDesc%=TECUSBD.Dev, USB\VID_05E0&PID_1200
+%USB\VID_05E0&PID_1600.DeviceDesc%=TECUSBD.Dev, USB\VID_05E0&PID_1600
+;DENSO Barcode Scanner
+%USB\VID_076D&PID_0012.DeviceDesc%=TECUSBD.Dev, USB\VID_076D&PID_0012
+;DENSO Bluetooth Wireless Scanner (BA10-RKU)
+%USB\VID_076D&PID_0013.DeviceDesc%=TECUSBD.Dev, USB\VID_076D&PID_0013
+
+[PreCopySection]
+HKR,,NoSetupUI,,1
+
+[DestinationDirs]
+TECUSBD.Files.Ext = 10,System32\Drivers
+;UUSBD.Files.Inf = 10,INF
+
+[TECUSBD.Dev]
+CopyFiles=TECUSBD.Files.Ext
+AddReg=TECUSBD.AddReg
+
+[TECUSBD.Dev.NT]
+CopyFiles=TECUSBD.Files.Ext
+AddReg=TECUSBD.AddReg,TECUSBD.EventLog
+
+[TECUSBD.Dev.NT.Services]
+Addservice = TECUSBD, 0x00000002, TECUSBD.AddService
+
+[TECUSBD.AddService]
+DisplayName    = %TECUSBD.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %10%\System32\Drivers\Tecusbd.sys
+LoadOrderGroup = Base
+AddReg         = TECUSBD.AddService.AddReg
+
+[TECUSBD.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,Tecusbd.sys
+
+[TECUSBD.AddService.AddReg]
+HKR,Parameters,"MaximumTransferSize",0x10001,4096
+HKR,Parameters,"DebugLevel",0x10001,1
+HKR,Parameters,"LogLevel",0x10001,0
+
+[TECUSBD.EventLog]
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\System\TecUsbd,EventMessageFile,0x00020000,"%%SystemRoot%%\System32\IoLogMsg.dll;%%SystemRoot%%\System32\drivers\TecUsbd.sys"
+HKLM,SYSTEM\CurrentControlSet\Services\Eventlog\System\TecUsbd,TypesSupported,0x00010001,7
+
+
+[TECUSBD.Files.Ext]
+Tecusbd.sys
+
+;---------------------------------------------------------------;
+
+[Strings]
+TOSHIBA_TEC="TOSHIBA TEC"
+TECMfg="TOSHIBA TEC"
+CBMMfg="TOSHIBA TEC"
+TECUSBD.SvcDesc="TEC Bulk & Interrupt USB Driver"
+TECUSBDClassName="TEC Bulk & Interrupt USB Device"
+
+;
+;デバイスを追加したら、ここにそのデバイスの名前を記述すること
+USB\VID_08A6&PID_0001.DeviceDesc="Toshiba TEC HS-530 USB Scanner"
+USB\VID_08A6&PID_0006.DeviceDesc="Toshiba TEC LS-780 USB Scanner"
+USB\VID_08A6&PID_000A.DeviceDesc="Toshiba TEC TRST-56 USB Printer"
+USB\VID_08A6&PID_000B.DeviceDesc="Toshiba TEC USB POS-Printer"
+USB\VID_08A6&PID_000C&MI_01.DeviceDesc="Toshiba TEC USB POSKeyboard(IDCR/Keylock)"
+USB\VID_08A6&PID_000D&MI_00.DeviceDesc="Toshiba TEC USB EX POS Keyboard"
+USB\VID_08A6&PID_000D&MI_01.DeviceDesc="Toshiba TEC USB EX POS Keyboard(IDCR/Keylock)"
+USB\VID_08A6&PID_0016.DeviceDesc="Toshiba TEC LS-780-T1T USB LineDisplay"
+USB\VID_08A6&PID_0017.DeviceDesc="Toshiba TEC LIUST-700 USB LineDisplay"
+USB\VID_08A6&PID_0020&MI_00.DeviceDesc="Toshiba TEC KITLS-780T1T-USB LineDisplay"
+USB\VID_08A6&PID_0020&MI_02.DeviceDesc="Toshiba TEC KITLS-780T1T-USB Keyboard"
+USB\VID_08A6&PID_0020&MI_03.DeviceDesc="Toshiba TEC KITLS-780T1T-USB Keyboard(IDCR)"
+USB\VID_08A6&PID_0031.DeviceDesc="Toshiba TEC LS-2200 USB Scanner"
+USB\VID_08A6&PID_0036.DeviceDesc="Toshiba TEC HS-560 USB Scanner"
+USB\VID_08A6&PID_0037.DeviceDesc="Toshiba TEC LS-2200-VS USB Scanner"
+USB\VID_08A6&PID_003D.DeviceDesc="Toshiba TEC TRST-A1x USB POS-Printer"
+USB\VID_08A6&PID_003F.DeviceDesc="Toshiba TEC LS-140 USB Scanner"
+USB\VID_08A6&PID_0046.DeviceDesc="Toshiba TEC TRST-A1x-CN USB POS-Printer"
+;TEC TRST-A00 USB POS Printer
+USB\VID_08A6&PID_0052.DeviceDesc="Toshiba TEC TRST-A00 USB POS-Printer"
+
+USB\VID_05E0&PID_1200.DeviceDesc="Symbol LS-2208 USB Scanner"
+USB\VID_05E0&PID_1600.DeviceDesc="Symbol LS-9208 USB Scanner"
+
+USB\VID_076D&PID_0012.DeviceDesc="DENSO GT11B USB Scanner"
+USB\VID_076D&PID_0013.DeviceDesc="DENSO GT10B Wireless Scanner(BA10-RKU)"
+

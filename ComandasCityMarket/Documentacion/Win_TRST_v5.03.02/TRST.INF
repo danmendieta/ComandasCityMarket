@@ -1,0 +1,97 @@
+;
+;   POS CCOMMON DRIVER for WindowsXP, Windows 7 x86, and Windows 7 x64
+;   Version 5.03.02
+;   Copyright TEC Singapore Pvt Ltd.
+;   2012.05.21
+
+[Version]
+Signature  = "$Windows NT$"
+Provider   = %oem%
+Class      = Printer
+ClassGUID  = {4D36E979-E325-11CE-BFC1-08002BE10318}
+DriverVer  = 05/21/2012,5.03.02
+CatalogFile= TRST.cat
+
+[Manufacturer]
+%oem%=TSE, ntx86, NTamd64
+
+[TSE]
+"TRST-A00 (ETR0)"    = ETR0.XPD,USBPRINT\TOSHIBATEC_TRST-A0XE872, LPTENUM\TOSHIBATEC_TRST-A0XE872
+"TRST-A1x (E-TR)"    = E-TR.XPD,USBPRINT\TOSHIBATEC_TRST-A1X7873, LPTENUM\TOSHIBATEC_TRST-A1X7873
+"TRST-C10BI"         = C-10.XPD,SERENUM\TRST-C10
+
+[TSE.ntx86]
+"TRST-A00 (ETR0)"    = ETR0.XPD,USBPRINT\TOSHIBATEC_TRST-A0XE872, LPTENUM\TOSHIBATEC_TRST-A0XE872
+"TRST-A1x (E-TR)"    = E-TR.XPD,USBPRINT\TOSHIBATEC_TRST-A1X7873, LPTENUM\TOSHIBATEC_TRST-A1X7873
+"TRST-C10BI"         = C-10.XPD,SERENUM\TRST-C10
+
+[TSE.NTamd64]
+"TRST-A00 (ETR0)"    = ETR0.XPD,USBPRINT\TOSHIBATEC_TRST-A0XE872, LPTENUM\TOSHIBATEC_TRST-A0XE872
+"TRST-A1x (E-TR)"    = E-TR.XPD,USBPRINT\TOSHIBATEC_TRST-A1X7873, LPTENUM\TOSHIBATEC_TRST-A1X7873
+"TRST-C10BI"         = C-10.XPD,SERENUM\TRST-C10
+
+[ETR0.XPD]
+CopyFiles   = @ETR0.XPD,DriverFile,LanMonFile
+DataFile    = ETR0.XPD
+DataSection = DriverFile_DATA_NT
+LanguageMonitor = "TRST Language Monitor,TRSTLMN.dll"
+NoTestPage  = 1
+
+[E-TR.XPD]
+CopyFiles   = @E-TR.XPD,DriverFile,LanMonFile
+DataFile    = E-TR.XPD
+DataSection = DriverFile_DATA_NT
+LanguageMonitor = "TRST Language Monitor,TRSTLMN.dll"
+NoTestPage  = 1
+
+[C-10.XPD]
+CopyFiles   = @C-10.XPD,DriverFile,LanMonFile
+DataFile    = C-10.XPD
+DataSection = DriverFile_DATA_NT
+LanguageMonitor = "TRST Language Monitor,TRSTLMN.dll"
+NoTestPage  = 1
+
+[DriverFile]
+TRSTGI.DLL
+TRSTUI.DLL
+TRSTCMND.DLL
+TRSTURES.DLL
+TRSTBrcd.dll
+
+[LanMonFile]
+TRSTLMN.dll
+
+[DriverFile_DATA_NT]
+DriverFile = TRSTGI.DLL
+ConfigFile = TRSTUI.DLL
+;HelpFile   = TRST.CHM
+
+[DestinationDirs]
+DefaultDestDir=66000
+LanMonFile=11
+;IcmFile=66003
+
+[SourceDisksNames.x86]
+1 = %disk1%,,,\i386
+2 = %disk1%,,,""
+
+[SourceDisksNames.amd64]
+1 = %disk1%,,,\amd64
+2 = %disk1%,,,""
+
+[SourceDisksFiles]
+TRSTGI.DLL=1
+TRSTUI.DLL=1
+TRSTCMND.DLL=1
+TRSTURES.DLL=1
+ETR0.XPD = 2
+E-TR.XPD = 2
+C-10.XPD = 2
+TRSTBrcd.dll=1
+TRSTLMN.dll =1
+
+[Strings]
+oem   = "TSE"
+disk1 = "TRST Printer Driver Disk"
+CLASSNAME = "Printer"
+

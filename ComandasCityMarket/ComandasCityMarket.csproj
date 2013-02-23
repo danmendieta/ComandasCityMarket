@@ -59,6 +59,7 @@
     <Reference Include="System.Web.Mvc, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -104,9 +105,11 @@
     <Compile Include="Models\Acceso.cs" />
     <Compile Include="Models\Alive.cs" />
     <Compile Include="Models\Catalogo.cs" />
+    <Compile Include="Models\Comanda.cs" />
     <Compile Include="Models\Empleado.cs" />
     <Compile Include="Models\Impresora.cs" />
     <Compile Include="Models\Mesa.cs" />
+    <Compile Include="Models\Orden.cs" />
     <Compile Include="Models\OrdenActiva.cs" />
     <Compile Include="Models\Respuesta.cs" />
     <Compile Include="Models\Restaurant.cs" />

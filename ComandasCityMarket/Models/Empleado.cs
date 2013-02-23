@@ -56,7 +56,8 @@ namespace ComandasCityMarket.Models
     }
 
 
-
+    [Serializable]
+    [DataContract]
     public class NuevoEmpleado
     {
         [DataMember]

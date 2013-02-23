@@ -1,0 +1,236 @@
+;;=============================================================================
+;;
+;; TRST Printer Data (E-TR.XPD)
+;;    for
+;; Microsoft Windows Printer Driver
+;;
+;;=============================================================================
+
+[printer]
+
+; Band-Size(MB), FLAG(regdata.h DRVFLAG_???), Maximum Compression-Rate,,Language ID(strID)
+; On creating data object, read Language ID(0:JP, 1:EN) from StringTable and set it toLanguage
+driver     = 4, 16777216, 100, 9999
+; Model Number, color, Primary-Resolutiion, Margins(Top/Bottom/Left/Right) in pixel(unit), Total of "User Defined Size", Total of "Actual Sized Form", Number of "User(not device) Defined Size", Paper Orientation(Default)(DMORIENT_???)
+device     = 1, 1, 203, 20, 0, 20, 0, 3, 2, 5, 1
+
+;	min, max, default
+scaling    = 25, 400, 100
+paperX     = 580, 800, 800
+paperY     = 254, 2970, 2970
+
+; LIST=List Type, Default Value
+
+; Specify available paper here
+paper      = LIST,1
+
+; Specify available tray here
+source     = LIST,0
+
+; Specify available resolution here
+resolution = LIST,0
+
+; Specify Color-Mode here if available
+pixel      = LIST,0
+
+; Position of Watermark
+wm_pos	 = LIST,0
+
+; Dither
+dither     = LIST,0
+
+; Font
+font = LIST,0
+
+; Barcode
+barcode    = LIST,0
+
+; Font substitution for TT
+substfont  = LIST, 0
+
+; Log Size
+logsize	 = LIST,0
+
+; Response command
+responsecmd	 = LIST,0
+
+; Printer Model
+; single 0 Dual 1
+printermodel = 0
+
+;Dual side Printing Control
+; single 1  dual 2  Dual with Pre Defined Data 3
+dualside = 1
+
+;Select Font Size
+; 1 or 2
+fontsize = 2
+
+;Select Printer Type
+; 1 = ETR0
+; 2 = E-TR
+; 3 = C-10
+printertype = 3
+
+;---------------------------------------------------------------------
+;Use the string from resource as Item name, not to use the string as
+;it is in datafile(specify as strID)
+;Not to specify the different ID from that of saved in resource
+;---------------------------------------------------------------------
+
+[paper]
+; command, DMPAPER_???, strID, sizlPaper(1/10mm), rcMargin(1/10mm), sizlPixel, AddPixelHortz
+; ManualOnly, RotateOK?
+; (DMPAPER_???...Device Defined:257Å` User Defined:300Å`309(within specified above))
+58x297			= 0, 650, 10010, 580, 2970, 20,  0, 20,  0, 432, 2376, 640, 2376, 192, 16, 0, 1
+80x297			= 1, 651, 10011, 800, 2970, 40,  0, 40,  0, 576, 2376, 640, 2376,  32, 32, 0, 1
+User Defined	= 2, 256, 10012, 800, 2970, 40,  0, 40,  0, 576, 2376, 640, 2376,  32, 32, 0, 1
+
+[pixel]
+; command(COLORMODE_???), idWin(DMCOLOR_?), strID, bits, plane
+Mono			= 1, 1, 0,  1, 1
+Color 			= 3, 2, 0, 24, 1
+;GrayScale		= 2, 2, 0,  8, 1
+
+[resolution]
+; command, DMRES_???, strID, xRes, yRes
+203.2 x 203.2 dpi		= 203, 203, 0, 203, 203
+
+[source]
+; command, DMBIN_???, strID
+Document(Feed,Cut)	   = 0,257,1312
+Document(Feed,NoCut)   = 1,258,1313
+Document(NoFeed,Cut)   = 2,259,1314
+Document(NoFeed,NoCut) = 3,260,1315
+Page(Feed,Cut)         = 4,261,1316
+Page(Feed,NoCut)       = 5,262,1317
+Page(NoFeed,Cut)       = 6,263,1318
+Custom                 = 7,700,1319
+;AutoLoading2		   =  0, 7, 10000
+;ManualLoading		   =  1, 4, 10001
+
+[dither]
+; command(Number to identify), idWin, strID
+Dispersed	= 1, 257, 1349
+Clustered	= 2, 258, 1350
+ErrorDiffuse= 3, 5,   1351
+ThreShold	= 4, 260, 1352
+
+[wm_pos]
+; command, ID, strID
+Top Left		= 1, 1, 10140
+Top Center		= 2, 2, 10141
+Top Right		= 3, 3, 10142
+Middle Left		= 4, 4, 10143
+Middle Center	= 5, 5, 10144
+Middle Right	= 6, 6, 10145
+Bottom Left		= 7, 7, 10146
+Bottom Center	= 8, 8, 10147
+Bottom Right	= 9, 9, 10148
+Tiled		    =10,10, 10149
+
+[logsize]
+; ID, size, strID
+2M	= 1, 2, 1390
+5M	= 2, 5, 1391
+10M	= 3, 10,1392
+20M	= 4, 20,1393
+
+[responsecmd]
+; dummy,dummy,dummy  name only use
+1B75 = 0, 0, 0
+1B76 = 0, 0, 0
+1D49 = 0, 0, 0
+1D72 = 0, 0, 0
+1B6E = 0, 0, 0
+1B6F = 0, 0, 0
+1B68 = 0, 0, 0
+1F31 = 0, 0, 0
+1F34 = 0, 0, 0
+1F35 = 0, 0, 0
+
+[font]
+; command, ID, ,strID, type, width, height
+FontA11			=  1,  1, 10501,  1,  1,  1
+FontA12			=  2,  2, 10502,  1,  1,  2
+FontA21			=  3,  3, 10503,  1,  2,  1
+FontA22			=  4,  4, 10504,  1,  2,  2
+FontA24			=  5,  5, 10505,  1,  2,  4
+FontA42			=  6,  6, 10506,  1,  4,  2
+FontA44			=  7,  7, 10507,  1,  4,  4
+FontA48			=  8,  8, 10508,  1,  4,  8
+FontA84			=  9,  9, 10509,  1,  8,  4
+FontA88			= 10, 10, 10510,  1,  8,  8
+FontB11			= 11, 11, 10511,  2,  1,  1
+FontB12			= 12, 12, 10512,  2,  1,  2
+FontB21			= 13, 13, 10513,  2,  2,  1
+FontB22			= 14, 14, 10514,  2,  2,  2
+FontB24			= 15, 15, 10515,  2,  2,  4
+FontB42			= 16, 16, 10516,  2,  4,  2
+FontB44			= 17, 17, 10517,  2,  4,  4
+FontB48			= 18, 18, 10518,  2,  4,  8
+FontB84			= 19, 19, 10519,  2,  8,  4
+FontB88			= 20, 20, 10520,  2,  8,  8
+
+
+[barcode]
+;command, idWin, strID, type
+UPC type A			=  0,  0, 10351, 1
+UPC type E			=  1,  1, 10352, 1
+EAN 13(JAN 13)		=  2,  2, 10353, 1
+EAN 8(JAN 8)		=  3,  3, 10354, 1
+Code 39				=  4,  4, 10355, 1
+ITF					=  5,  5, 10356, 1
+Codabar				=  6,  6, 10357, 1
+Code93				=  7,  7, 10358, 1
+Code 128			=  8,  8, 10359, 1
+PDF417				= 10, 10, 10360, 2
+
+
+[substfont]
+;command, idWin, strID,
+Do Not Substitute	=   0,   0, 10600
+FontA				=   1,   1, 10601
+FontB				=   2,   2, 10602
+Control				= 200, 200, 10603
+controlA			= 300, 300, 10604
+Barcode1			= 100, 100, 10605
+Barcode2			= 101, 101, 10606
+Barcode3			= 102, 102, 10607
+Barcode4			= 103, 103, 10608
+Barcode5			= 104, 104, 10609
+Barcode6			= 105, 105, 10610
+Barcode7			= 106, 106, 10611
+Barcode8			= 107, 107, 10612
+2D-Code1			= 150, 150, 10613
+2D-Code2			= 151, 151, 10614
+2D-Code3			= 152, 152, 10615
+2D-Code4			= 153, 153, 10616
+2D-Code5			= 154, 154, 10617
+2D-Code6			= 155, 155, 10618
+2D-Code7			= 156, 156, 10619
+2D-Code8			= 157, 157, 10620
+
+[Parallel]
+cycletime=150
+delaytime=100
+waittime=300
+sendtimeout=2000
+[Serial]
+cycletime=150
+delaytime=100
+waittime=300
+sendtimeout=2000
+
+[USB]
+cycletime=150
+delaytime=100
+waittime=300
+sendtimeout=2000
+
+[LAN]
+cycletime=300
+waittime=300
+sendtimeout=2000
+dstport=3000
+
