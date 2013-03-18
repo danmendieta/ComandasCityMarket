@@ -40,6 +40,8 @@ namespace ComandasCityMarket.Models
         public decimal ordn_impuni { set; get; }
         [DataMember]
         public decimal ordn_impart { set; get; }
+        /*[DataMember]
+        public int tipp_id { set; get; }*/
         [DataMember]
         public string ordn_obsv { set; get; }
         [DataMember]

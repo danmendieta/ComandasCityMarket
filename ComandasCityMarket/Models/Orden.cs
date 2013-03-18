@@ -71,6 +71,14 @@ namespace ComandasCityMarket.Models
         public int ordn_id { set; get; }
     }
 
+    [Serializable]
+    [DataContract]
+    public class RespNuevaOrden : Respuesta
+    {
+        [DataMember]
+        public int ordn_id { set; get; }
+    }
+
 
     [Serializable]
     [DataContract]
@@ -91,6 +99,8 @@ namespace ComandasCityMarket.Models
         public string art_desc{set;get;}
         [DataMember]
         public decimal ordn_impart {set;get;}
+        [DataMember]
+        public decimal ordn_impuni { set; get; }
         [DataMember]
         public int ordn_nper{set;get;}  
     }

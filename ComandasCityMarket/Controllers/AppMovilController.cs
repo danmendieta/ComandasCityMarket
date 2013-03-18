@@ -39,12 +39,11 @@ namespace ComandasCityMarket.Controllers
                 List<Modificador> modificadores = new List<Modificador>();
                 try//EL SIGUEINTE BLOQUE ES PARA EXTRAER LAS CATEGORIAS
                 {
-                    SqlCommand command = new SqlCommand("SELECT * FROM AGRUPACION_CAT WHERE AGRU_PADRE = 0;", myConnection);
+                    SqlCommand command = new SqlCommand("SELECT A.* FROM AGRUPACION_CAT A, RESTAURANT_AGRUP B WHERE B.REST_ID = " + reqCatalogo.rest_id + " AND A.AGRU_PADRE = 0 AND A.AGRU_ID=B.AGRU_ID", myConnection);
                     reader = command.ExecuteReader();
                     while (reader.Read())
                     {
                         Categoria categoria = new Categoria();
-
                         List<Modificador> listaModificadores = new List<Modificador>();
                         categoria.agru_des = reader["agru_des"].ToString();
                         categoria.agru_desc = reader["agru_desc"].ToString();
@@ -55,7 +54,9 @@ namespace ComandasCityMarket.Controllers
                         {
                             categoria.hasSubCat = true;
                             //SqlCommand commandFindSub = new SqlCommand("SELECT * FROM AGRUPACION_CAT WHERE AGRU_TIPO = 1 AND AGRU_PADRE = "+categoria.agru_padre, myConnection);
-                            SqlCommand commandFindSub = new SqlCommand("SELECT * FROM AGRUPACION_CAT WHERE AGRU_PADRE = " + categoria.agru_id, myConnection);
+                            //SqlCommand commandFindSub = new SqlCommand("SELECT * FROM AGRUPACION_CAT WHERE AGRU_PADRE = " + categoria.agru_id, myConnection);
+                            SqlCommand commandFindSub = new SqlCommand("SELECT A.* FROM AGRUPACION_CAT A, RESTAURANT_AGRUP B WHERE B.REST_ID = " + reqCatalogo.rest_id + " AND A.AGRU_PADRE = "+ categoria.agru_id+" AND A.AGRU_ID=B.AGRU_ID" , myConnection);
+                            
                             SqlDataReader readerSub = commandFindSub.ExecuteReader();
                             List<SubCategoria> listasubCateg = new List<SubCategoria>();
                             while (readerSub.Read())
@@ -87,12 +88,13 @@ namespace ComandasCityMarket.Controllers
                                 {
                                     Modificador modificador = new Modificador();
                                     modificador.agru_consec = Convert.ToInt32(readerModif["agru_consec"].ToString());
-                                    modificador.agru_des = readerModif["agru_consec"].ToString();
-                                    modificador.agru_desc = readerModif["agru_consec"].ToString();
-                                    modificador.agru_id = Convert.ToInt32(readerModif["agru_consec"].ToString());
+                                    modificador.agru_des = readerModif["agru_des"].ToString();
+                                    modificador.agru_desc = readerModif["agru_desc"].ToString();
+                                    modificador.agru_id = Convert.ToInt32(readerModif["agru_id"].ToString());
                                     listaModificadores.Add(modificador);
                                 }
                                 subCat.modificadores = listaModificadores;
+                                //categoria.modificadores = listaModificadores;
                                 listasubCateg.Add(subCat);
                             }//Fin Busqueda SubCategorias
                             categoria.subCat = listasubCateg;
@@ -121,15 +123,15 @@ namespace ComandasCityMarket.Controllers
                             {
                                 Modificador modificador = new Modificador();
                                 modificador.agru_consec = Convert.ToInt32(readerModif["agru_consec"].ToString());
-                                modificador.agru_des = readerModif["agru_consec"].ToString();
-                                modificador.agru_desc = readerModif["agru_consec"].ToString();
-                                modificador.agru_id = Convert.ToInt32(readerModif["agru_consec"].ToString());
+                                modificador.agru_des = readerModif["agru_des"].ToString();
+                                modificador.agru_desc = readerModif["agru_desc"].ToString();
+                                modificador.agru_id = Convert.ToInt32(readerModif["agru_id"].ToString());
                                 listaModificadores.Add(modificador);
                             }//FIN while musca modificador
                             categoria.modificadores = listaModificadores;
-                        }
+                        }//end else
                         categorias.Add(categoria);
-                    }
+                    }//end while
                     catalogo.catalogo = categorias;
                 }
                 catch (SqlException exCat)
@@ -166,18 +168,20 @@ namespace ComandasCityMarket.Controllers
                     myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                     myConnection.Open();
                     //SqlCommand command = new SqlCommand("select * from RESTAURANT a, EMPLEADO b where b.EMPL_COD = " + login.num_empleado + " and a.REST_ID = " + login.rest_id + " and b.EMPL_STAT ='ALTA'", myConnection);
-                    SqlCommand command = new SqlCommand("select * from 	RESTAURANT a, ff_cat_usuario b where b.usr_numempleado = "+login.num_empleado+" and a.REST_ID = "+login.rest_id, myConnection);
+                    SqlCommand command = new SqlCommand("select (select SUCC_DES from SUCURSAL where SUCC_ID = a.SUCC_ID) as SUCC_DES, * from 	RESTAURANT a, ff_cat_usuario b where b.usr_numempleado = " + login.num_empleado + " and a.REST_ID = " + login.rest_id, myConnection);
                     reader = command.ExecuteReader();
                     Empleado emp = null;
-                    Restaurant rest = null;
+                    RestDetalle rest = null;
                     while (reader.Read())
                     {
                         emp = new Empleado();
-                        rest = new Restaurant();
+                        rest = new RestDetalle();
                         rest.rest_des = reader["rest_des"].ToString();
                         rest.rest_id = Convert.ToInt32(reader["rest_id"].ToString());
                         rest.succ_id = Convert.ToInt32(reader["succ_id"].ToString());
-                        /*emp.empl_apm = reader["empl_apm"].ToString();
+                        rest.succ_des = reader["succ_des"].ToString();
+                        /*
+                        emp.empl_apm = reader["empl_apm"].ToString();
                         emp.empl_app = reader["empl_app"].ToString();
                         emp.empl_cod = Convert.ToInt32(reader["empl_cod"].ToString());
                         emp.empl_nom = reader["empl_nom"].ToString();
@@ -266,7 +270,7 @@ namespace ComandasCityMarket.Controllers
                     {
 
                         mesas.success = false;
-                        mesas.message = "SIN MESAS";
+                        mesas.message = "No hay mesas disponibles";
                     }
 
                 }
@@ -360,7 +364,7 @@ namespace ComandasCityMarket.Controllers
                     if (listaRestaurantes.Count == 0)
                     {
                         respuestaRestaurantes.success = false;
-                        respuestaRestaurantes.message += "NO HAY RESTAURANTES ASOCIADOS A NUMERO DE EMPLEADO "+req.empl_cod;
+                        respuestaRestaurantes.message = "Mesero Inexistente";
                         return Json(respuestaRestaurantes);
                     }
                     respuestaRestaurantes.restaurantes = listaRestaurantes;
@@ -389,7 +393,7 @@ namespace ComandasCityMarket.Controllers
         [HttpPost]
         public ActionResult newOrden(NuevaOrden newOrden)
         {
-            Respuesta resp = new Respuesta();
+            RespNuevaOrden resp = new RespNuevaOrden();
             SqlConnection myConnection = new SqlConnection();
             try
             {
@@ -407,6 +411,7 @@ namespace ComandasCityMarket.Controllers
                     int iFecha = Convert.ToInt32(""+fecha.Year+""+fecha.Month +""+fecha.Day);
                     int iHora = Convert.ToInt32(fecha.Hour + ""+fecha.Minute);                    
                     command = new SqlCommand("INSERT INTO ORDEN_CTRL (ORDN_ID, ORDN_STAT, EMPL_COD, ORDN_FMOV, ORDN_HMOV, ORDN_OBSV) VALUES (@IDORD,'INIC', @MESE,@FECH,@HORA,@OBSV)", myConnection);
+                    resp.ordn_id = idorden;
                     command.Parameters.AddWithValue("@IDORD", idorden);
                     command.Parameters.AddWithValue("@MESE", newOrden.ordn_mese);
                     command.Parameters.AddWithValue("@FECH", iFecha);
@@ -764,16 +769,19 @@ namespace ComandasCityMarket.Controllers
             {
                 myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                 myConnection.Open();
-                command = new SqlCommand("select a.ORDN_CANT, b.ART_DESC, a.ORDN_IMPART, c.ORDN_NPER from ORDEN_ARTICULO a, ARTICULO b, ORDEN C where b.ART_EAN = a.ART_EAN and a.ORDN_ID = "+orden.ordn_id+" and c.ORDN_ID= "+orden.ordn_id, myConnection);
+                //command = new SqlCommand("select a.ORDN_CANT, b.ART_DESC, a.ORDN_IMPUNI, a.ORDN_IMPART, c.ORDN_NPER from ORDEN_ARTICULO a, ARTICULO b, ORDEN C where b.ART_EAN = a.ART_EAN and a.ORDN_ID = " + orden.ordn_id + " and c.ORDN_ID= " + orden.ordn_id, myConnection);
+                command = new SqlCommand("select SUM(ORDN_CANT)AS ORDN_CANT, SUM(ORDN_IMPART) AS ORDN_IMPART, (select art_desc from ARTICULO where ARTICULO.ART_EAN = ORDEN_ARTICULO.ART_EAN) AS ART_DESC,(SELECT ORDN_NPER FROM ORDEN WHERE ORDN_ID = "+ orden.ordn_id+" ) AS ORDN_NPER, ORDN_IMPUNI from ORDEN_ARTICULO where ORDN_ID = "+ orden.ordn_id +" GROUP BY ART_EAN, ORDN_IMPUNI" , myConnection);
+                
                 reader = command.ExecuteReader();
                 List<DetalleOrdenComanda> listaDetalles = new List<DetalleOrdenComanda>();
                 while (reader.Read())
                 {
                     DetalleOrdenComanda ordComandDet = new DetalleOrdenComanda();
-                    ordComandDet.art_desc = reader["art_desc"].ToString();
-                    ordComandDet.ordn_cant = Convert.ToInt32(reader["ordn_cant"].ToString());
-                    ordComandDet.ordn_impart = Convert.ToDecimal(reader["ordn_impart"].ToString());
-                    ordComandDet.ordn_nper = Convert.ToInt32(reader["ordn_nper"].ToString());
+                    ordComandDet.art_desc = reader["art_desc"].ToString();//
+                    ordComandDet.ordn_cant = Convert.ToInt32(reader["ordn_cant"].ToString());//
+                    ordComandDet.ordn_impart = Convert.ToDecimal(reader["ordn_impart"].ToString());//
+                    ordComandDet.ordn_impuni = Convert.ToDecimal(reader["ordn_impuni"].ToString());
+                    ordComandDet.ordn_nper = Convert.ToInt32(reader["ordn_nper"].ToString());//
                     listaDetalles.Add(ordComandDet);
                 }
                 detalledeOrden.productos = listaDetalles;
@@ -1070,12 +1078,21 @@ namespace ComandasCityMarket.Controllers
                     while (reader.Read())
                     {
                         sArticulo = reader["art_des"].ToString();
+                        if (sArticulo.Length > 20)
+                        {
+                            sArticulo = sArticulo.Substring(0, 20);
+                        }
+
                     }
                     command = new SqlCommand("select agru_des from agrupacion_modif where agru_id = " + artOrd.agru_id + " and agru_consec=" + artOrd.agru_consec, myConnection);
                     reader = command.ExecuteReader();
                     while (reader.Read())
                     {
                         sModificador = reader["agru_des"].ToString();
+                        if (sModificador.Length > 18)
+                        {
+                            sModificador = sModificador.Substring(0,18);
+                        }
                     }
 
                 }
@@ -1086,13 +1103,62 @@ namespace ComandasCityMarket.Controllers
                 Offset = Offset + 10;
                 graphics.DrawString(artOrd.ordn_cant.ToString(), new Font(sFont, (float)8.5, FontStyle.Regular),
                         new SolidBrush(Color.Black), startX + 10, startY + Offset);
+                
                 graphics.DrawString(sArticulo, new Font(sFont, (float)8.5, FontStyle.Regular),
                         new SolidBrush(Color.Black), startX + 30, startY + Offset);
                 if (artOrd.ordn_obsv != null && artOrd.ordn_obsv.Length > 3)
                 {
                     Offset = Offset + 10;
-                    graphics.DrawString("O: " + artOrd.ordn_obsv, new Font(sFont, (float)7.8, FontStyle.Regular),
+                    string Obsvc = artOrd.ordn_obsv;
+                    /*BLOQUE PARA CONTROLAR LA IMPRESION DE OBSERVACIONES*/
+                    string obsvValidado = "";
+                    int tammax = 25;
+                    int tamobsv = Obsvc.Length;
+                    if (tamobsv > tammax)
+                    {
+                        double oper = (tamobsv / tammax);
+                        double dblCant = Math.Ceiling(oper) +1;
+                        try
+                        {  
+                            for (int y = 0; y < dblCant; y++)
+                            {
+                                double z = y * tammax;
+                                int aa = (int)Math.Ceiling(z);
+                                int bb = aa + tammax;
+                                
+                                if(y+1< dblCant){
+                                    obsvValidado = Obsvc.Substring(aa, tammax);
+                                    //obsvValidado = Environment.NewLine;
+                                    graphics.DrawString("O:"+obsvValidado, new Font(sFont, (float)7.8, FontStyle.Regular),
+                                                        new SolidBrush(Color.Black), startX+35 , startY + Offset);
+                                    Offset += 10;
+                                }else
+                                {
+                                    
+                                    obsvValidado = Obsvc.Substring(aa, tamobsv-aa);
+                                    graphics.DrawString("O:"  + obsvValidado, new Font(sFont, (float)7.8, FontStyle.Regular),
+                                                        new SolidBrush(Color.Black), startX + 35, startY + Offset);
+                                    Offset += 10;
+                                    break;
+                                }
+
+                            }
+                        }
+                        catch (Exception tribaes)
+                        {
+                            graphics.DrawString("=( " + tribaes, new Font(sFont, (float)7.8, FontStyle.Regular),
+                                                       new SolidBrush(Color.Black), 0, startY + Offset);
+                            Offset += 10;
+                        }
+
+                    }
+                    else
+                    {
+                        graphics.DrawString("O:+ " + Obsvc, new Font(sFont, (float)7.8, FontStyle.Regular),
                         new SolidBrush(Color.Black), startX + 35, startY + Offset);
+                    }
+
+                    
                 }
                 if (artOrd.hasModif)
                 {
@@ -1216,10 +1282,10 @@ namespace ComandasCityMarket.Controllers
                         Brushes.Black, startX - 8, startY + Offset);
             graphics.DrawString("Precio",
                         new Font(sFont, (float)8.5, FontStyle.Regular),
-                        Brushes.Black, startX + 170, startY + Offset);
+                        Brushes.Black, CentrarImporte(graphics,"Precio"), startY + Offset);
             graphics.DrawString("Total",
                         new Font(sFont, (float)8.5, FontStyle.Regular),
-                        Brushes.Black, startX + 220, startY + Offset);
+                        Brushes.Black, CentrarTotal(graphics,"Total"), startY + Offset);
             Offset = Offset + 20;
             String underLine = "---------------------------------------";
             graphics.DrawString(underLine, new Font(sFont, (float)8.5, FontStyle.Regular),
@@ -1232,20 +1298,20 @@ namespace ComandasCityMarket.Controllers
             
             try
             {
-                command = new SqlCommand("select *  from orden_articulo where ordn_id= "+orden.ordn_id, myConnection);
+                command = new SqlCommand("select  art_ean, SUM(ORDN_CANT) as ordn_cant,SUM(ORDN_IMPUNI) as ordn_impuni, SUM(ORDN_IMPART) as ordn_impart from orden_articulo where ordn_id= "+ orden.ordn_id+" group by  ART_EAN" , myConnection);
                 reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     DetalleOrden ordart = new DetalleOrden();
-
                     ordart.art_ean = Convert.ToDecimal(reader["art_ean"].ToString());
                     ordart.ordn_cant = Convert.ToInt32(reader["ordn_cant"].ToString());
-                    ordart.ordn_id = Convert.ToInt32(reader["ordn_id"].ToString());
+                    //ordart.ordn_id = Convert.ToInt32(reader["ordn_id"].ToString());
+                    ordart.ordn_id = orden.ordn_id;
                     ordart.ordn_impart = Convert.ToDecimal(reader["ordn_impart"].ToString());
                     ordart.ordn_impuni = Convert.ToDecimal(reader["ordn_impuni"].ToString());
-                    ordart.ordn_obsv = (reader["ordn_obsv"].ToString());
+                    //ordart.ordn_obsv = (reader["ordn_obsv"].ToString());
                     listaDetallesOrden.Add(ordart);
-                    
+                    iCantidadArticulos+=ordart.ordn_cant;
                 }
             }catch(Exception excv){
 
@@ -1262,7 +1328,7 @@ namespace ComandasCityMarket.Controllers
                     reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        sArticulo = reader["art_des"].ToString();
+                        sArticulo = reader["art_des"].ToString().Replace("\n", " ");
                     }
                     //command = new SqlCommand("select agru_des from agrupacion_modif where agru_id = " + artOrd.agru_id + " and agru_consec=" + artOrd.agru_consec, myConnection);
                     //reader = command.ExecuteReader();
@@ -1275,18 +1341,23 @@ namespace ComandasCityMarket.Controllers
                 catch (Exception exc)
                 {
                 }
-
+                if (sArticulo.Length>18)
+                {
+                    sArticulo=sArticulo.Substring(0, 18);
+                }
                 Offset = Offset + 10;
                 graphics.DrawString(artOrd.ordn_cant.ToString(), new Font(sFont, (float)8, FontStyle.Regular),
                         new SolidBrush(Color.Black), startX + 5, startY + Offset);
                 graphics.DrawString(sArticulo, new Font(sFont, (float)8, FontStyle.Regular),
                         new SolidBrush(Color.Black), startX + 25, startY + Offset);
-                graphics.DrawString(artOrd.ordn_impuni.ToString(), new Font(sFont, (float)8, FontStyle.Regular),
-                        new SolidBrush(Color.Black), startX + 170, startY + Offset);
+                string sImportUni = artOrd.ordn_impuni.ToString();
+                graphics.DrawString(sImportUni, new Font(sFont, (float)8, FontStyle.Regular),
+                        new SolidBrush(Color.Black), CentrarImporte(graphics, sImportUni), startY + Offset);//new SolidBrush(Color.Black), startX + 170, startY + Offset);
                 decimal totl = artOrd.ordn_impuni * artOrd.ordn_cant;
                 totaltotales += totl;
-                graphics.DrawString(Convert.ToString(totl), new Font(sFont, (float)8, FontStyle.Regular),
-                        new SolidBrush(Color.Black), startX + 220, startY + Offset);
+                string svonvert= Convert.ToString(totl);
+                graphics.DrawString(svonvert, new Font(sFont, (float)8, FontStyle.Regular),
+                        new SolidBrush(Color.Black), CentrarTotal(graphics, svonvert), startY + Offset);
                 //if (artOrd.ordn_obsv != null && artOrd.ordn_obsv.Length > 3)
                 //{
                 //    Offset = Offset + 10;
@@ -1330,8 +1401,9 @@ namespace ComandasCityMarket.Controllers
             Offset = Offset + 10;
             graphics.DrawString("Total ", new Font(sFont, (float)7.5, FontStyle.Regular),
                         new SolidBrush(Color.Black), startX +170, startY + Offset);
+            string stottales = "" + totaltotales;
             graphics.DrawString("" + totaltotales, new Font(sFont, (float)7.5, FontStyle.Regular),
-                        new SolidBrush(Color.Black), startX +220, startY + Offset);
+                        new SolidBrush(Color.Black), CentrarTotal(graphics, stottales), startY + Offset);
             Offset = Offset + 20;
             graphics.DrawString("No. de Articulos:" + iCantidadArticulos, new Font(sFont, (float)7.5, FontStyle.Regular),
                         new SolidBrush(Color.Black), startX - 6, startY + Offset);
@@ -1358,12 +1430,27 @@ namespace ComandasCityMarket.Controllers
             Offset = Offset + 20;
 
         }
-        
+
         public float CentrarTexto(Graphics graphics, String letter)
         {
-
             SizeF size = graphics.MeasureString(letter.ToString(), new Font(sFont, (float)8.6, FontStyle.Bold));
-            float tamano=(280-size.Width)/2;
+            float tamano = (280 - size.Width) / 2;
+            return tamano;
+        }
+
+        public float CentrarImporte(Graphics graphics, String letter)
+        {
+            SizeF size = graphics.MeasureString(letter.ToString(), new Font(sFont, (float)8.6, FontStyle.Bold));
+            double ttam = 1.24;
+            float tamano = (280 - size.Width) / (float)ttam;
+            return tamano;
+        }
+
+        public float CentrarTotal(Graphics graphics, String letter)
+        {
+            SizeF size = graphics.MeasureString(letter.ToString(), new Font(sFont, (float)8.6, FontStyle.Bold));
+            double ttam= .96;
+            float tamano = (280 - size.Width) / (float)ttam;
             return tamano;
         }
         

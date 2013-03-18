@@ -78,5 +78,7 @@ namespace ComandasCityMarket.Models
     {
         [DataMember]
         public int succ_id { set; get; }
+        [DataMember]
+        public int rest_id { set; get; }
     }
 }

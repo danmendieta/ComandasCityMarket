@@ -22,6 +22,14 @@ namespace ComandasCityMarket.Models
 
     [Serializable]
     [DataContract]
+    public class RestDetalle : Restaurant
+    {
+        [DataMember]
+        public string succ_des { set; get; }
+    }
+
+    [Serializable]
+    [DataContract]
     public class RespRestaurant : Respuesta {
         [DataMember]
         public List<Restaurant> restaurantes { set; get; }
@@ -50,5 +58,14 @@ namespace ComandasCityMarket.Models
         public string rest_des { set; get; }
         [DataMember]
         public int succ_id { set; get; }
+    }
+    [Serializable]
+    [DataContract]
+    public class DetalleRest:Respuesta
+    {
+        [DataMember]
+        public string rest_des { set; get; }
+        [DataMember]
+        public string succ_des { set; get; }
     }
 }

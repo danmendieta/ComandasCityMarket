@@ -940,7 +940,37 @@ namespace ComandasCityMarket.Controllers
             return Json(impresoras);
         }//END GET IMPRESORAS
 
-
+       [HttpPost]
+        public ActionResult getDetalleRest(ReqDeleteRestaurant idRest){
+            DetalleRest detalles = new DetalleRest();
+            SqlDataReader reader = null;
+            SqlConnection myConnection = new SqlConnection();
+            try
+            {
+                myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
+                myConnection.Open();
+                SqlCommand command = new SqlCommand("select REST_DES, (select succ_des from SUCURSAL where SUCC_ID = a.SUCC_ID) as succ_des from RESTAURANT a where a.REST_ID="+idRest.rest_id, myConnection);
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    detalles.rest_des  = reader["rest_des"].ToString();
+                    detalles.succ_des = reader["succ_des"].ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                detalles.success = false;
+                detalles.message = "ERROR " + ex.Message;
+                return Json(detalles);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            detalles.success = true;
+            detalles.message = "OK";
+            return Json(detalles);
+        }
 
     }
 }

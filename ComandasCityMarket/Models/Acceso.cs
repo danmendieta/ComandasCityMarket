@@ -15,6 +15,8 @@ namespace ComandasCityMarket.Models
         public int num_empleado { set; get; }
         [DataMember]
         public int rest_id { set; get; }
+        [DataMember]
+        public string password { set; get; }
     }
     [Serializable]
     [DataContract]
