@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using log4net;
+using log4net.Config;
 
 namespace ComandasCityMarket
 {
@@ -12,8 +14,11 @@ namespace ComandasCityMarket
 
     public class MvcApplication : System.Web.HttpApplication
     {
+        protected static readonly ILog log = LogManager.GetLogger(typeof(MvcApplication));
+        
         public static void RegisterRoutes(RouteCollection routes)
         {
+
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
@@ -101,6 +106,9 @@ namespace ComandasCityMarket
 
         protected void Application_Start()
         {
+           log4net.Config.XmlConfigurator.Configure();
+           
+
             AreaRegistration.RegisterAllAreas();
             System.Web.Mvc.ModelBinders.Binders.DefaultBinder = new ComandasCityMarket.ModelBinders.ApiDefaultModelBinder();
             RegisterRoutes(RouteTable.Routes);

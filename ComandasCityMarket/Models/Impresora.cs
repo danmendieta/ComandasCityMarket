@@ -26,6 +26,19 @@ namespace ComandasCityMarket.Models
         [DataMember]
         public int tipp_id { set; get; }
     }
+
+    [Serializable]
+    [DataContract]
+    public class ImpresoraDescrip : Impresora
+    {
+        [DataMember]
+        public string rest_des { set; get; }
+        [DataMember]
+        public string ubic_des { set; get; }
+        [DataMember]
+        public string tipp_des { set; get; }
+    }
+
     [Serializable]
     [DataContract]
     public class NewImpresora
@@ -55,6 +68,6 @@ namespace ComandasCityMarket.Models
     public class RespImpresora : Respuesta
     {
         [DataMember]
-        public List<Impresora> impresoras { set; get; }
+        public List<ImpresoraDescrip> impresoras { set; get; }
     }
 }

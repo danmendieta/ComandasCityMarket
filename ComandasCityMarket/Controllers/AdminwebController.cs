@@ -375,19 +375,16 @@ namespace ComandasCityMarket.Controllers
             {
                 myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                 myConnection.Open();
-                SqlCommand command = new SqlCommand("select * from EMPLEADO where SUCC_ID =@SUCC", myConnection);
+                SqlCommand command = new SqlCommand("select * from ff_cat_usuario where usr_succ_id =@SUCC", myConnection);
                 command.Parameters.AddWithValue("@SUCC", emp.succ_id);
                 reader = command.ExecuteReader();
                 List<Empleado> listaEmpleado = new List<Empleado>();
                 while (reader.Read())
                 {
                     Empleado empleado = new Empleado();
-                    empleado.empl_apm = reader["empl_apm"].ToString();
-                    empleado.empl_app = reader["empl_app"].ToString();
-                    empleado.empl_cod = Convert.ToInt32(reader["empl_cod"].ToString());
-                    empleado.empl_nom = reader["empl_nom"].ToString();
-                    empleado.empl_stat = reader["empl_stat"].ToString();
-                    empleado.empl_tipo = reader["empl_tipo"].ToString();
+                    empleado.empl_cod = Convert.ToInt32(reader["usr_id"].ToString());
+                    empleado.empl_nom = reader["usr_numempleado"].ToString();
+                    empleado.empl_tipo = reader["usr_nombre"].ToString();
                     listaEmpleado.Add(empleado);
                 }
                 empleados.listaEmpleados = listaEmpleado;
@@ -671,12 +668,14 @@ namespace ComandasCityMarket.Controllers
             {
                 myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                 myConnection.Open();
-                SqlCommand command = new SqlCommand("UPDATE MESA SET MESA_CVE = @MESACVE, MESA_DES =@MESADES, MESA_STAT ='ALTA', REST_ID = @RESTID, UBIC_CONSEC= @UBIC WHERE MESA_ID = @MESAID", myConnection);
+                SqlCommand command = new SqlCommand("UPDATE MESA SET MESA_CVE = @MESACVE, MESA_DES =@MESADES, MESA_STAT =@MESASTAT, REST_ID = @RESTID, UBIC_CONSEC= @UBIC WHERE MESA_ID = @MESAID", myConnection);
                 command.Parameters.AddWithValue("@MESACVE", mesa.mesa_cve);
                 command.Parameters.AddWithValue("@MESADES", mesa.mesa_des);
                 command.Parameters.AddWithValue("@RESTID", mesa.rest_id);
                 command.Parameters.AddWithValue("@UBIC", mesa.ubic_consec);
                 command.Parameters.AddWithValue("@MESAID", mesa.mesa_id);
+                command.Parameters.AddWithValue("@MESASTAT", mesa.mesa_stat);
+
                 if (0 < command.ExecuteNonQuery())
                 {
                     resp.success = true;
@@ -867,13 +866,14 @@ namespace ComandasCityMarket.Controllers
             {
                 myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                 myConnection.Open();
-                SqlCommand command = new SqlCommand("UPDATE IMPRESORA SET IMPR_CONF =@CONF, IMPR_DES =@DES, IMPR_STAT='ALTA', REST_ID=@REST, TIPP_ID=@TIPP, UBIC_CONSEC= @UBIC  WHERE IMPR_ID = @IMPRID", myConnection);
+                SqlCommand command = new SqlCommand("UPDATE IMPRESORA SET IMPR_CONF =@CONF, IMPR_DES =@DES, IMPR_STAT=@STATUT, REST_ID=@REST, TIPP_ID=@TIPP, UBIC_CONSEC= @UBIC  WHERE IMPR_ID = @IMPRID", myConnection);
                 command.Parameters.AddWithValue("@CONF", impresora.impr_conf);
                 command.Parameters.AddWithValue("@DES", impresora.impr_des);
                 command.Parameters.AddWithValue("@IMPRID", impresora.impr_id);
                 command.Parameters.AddWithValue("@REST", impresora.rest_id);
                 command.Parameters.AddWithValue("@TIPP", impresora.tipp_id);
                 command.Parameters.AddWithValue("@UBIC", impresora.ubic_consec);
+                command.Parameters.AddWithValue("@STATUT", impresora.impr_stat);
                 if (0 < command.ExecuteNonQuery())
                 {
                     resp.success = true;
@@ -908,12 +908,12 @@ namespace ComandasCityMarket.Controllers
             {
                 myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                 myConnection.Open();
-                SqlCommand command = new SqlCommand("SELECT * FROM IMPRESORA", myConnection);
+                SqlCommand command = new SqlCommand("SELECT *, (select REST_DES from RESTAURANT where RESTAURANT.REST_ID = IMPRESORA.REST_ID) AS REST_DES, (SELECT UBIC_DES FROM UBICACION WHERE UBICACION.UBIC_CONSEC = IMPRESORA.UBIC_CONSEC) AS UBIC_DES, (SELECT TIPP_DES FROM TIPO_PRODUCTO WHERE TIPO_PRODUCTO.TIPP_ID = IMPRESORA.TIPP_ID) AS TIPP_DES FROM IMPRESORA", myConnection);
                 reader = command.ExecuteReader();
-                List<Impresora> listaImpr = new List<Impresora>();
+                List<ImpresoraDescrip> listaImpr = new List<ImpresoraDescrip>();
                 while (reader.Read())
                 {
-                    Impresora impresora = new Impresora();
+                    ImpresoraDescrip impresora = new ImpresoraDescrip();
                     impresora.impr_conf = reader["impr_conf"].ToString();
                     impresora.impr_des = reader["impr_des"].ToString();
                     impresora.impr_id = Convert.ToInt32(reader["impr_id"].ToString());
@@ -921,6 +921,10 @@ namespace ComandasCityMarket.Controllers
                     impresora.rest_id = Convert.ToInt32(reader["rest_id"].ToString());
                     impresora.tipp_id = Convert.ToInt32(reader["tipp_id"].ToString());
                     impresora.ubic_consec = Convert.ToInt32(reader["ubic_consec"].ToString());
+                    impresora.rest_des = reader["rest_des"].ToString();
+                    impresora.ubic_des = reader["ubic_des"].ToString();
+                    impresora.tipp_des = reader["tipp_des"].ToString();
+
                     listaImpr.Add(impresora);
                 }
                 impresoras.impresoras = listaImpr;

@@ -10,6 +10,8 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Runtime.Serialization.Json;
 using ComandasCityMarket.Models;
+using log4net;
+using log4net.Config;
 
 
 using System.ComponentModel;
@@ -20,13 +22,14 @@ namespace ComandasCityMarket.Controllers
 {
     public class AppMovilController : Controller
     {
+        protected static readonly ILog log = LogManager.GetLogger(typeof(AppMovilController));
         string sFont = "Lucida Console";
 
-        //
-        // GET: /AppMovil/
         [HttpPost]
         public ActionResult getCatalogo(ReqCatalogo reqCatalogo)
         {
+           
+            log.Info("Solicitando el Catalogo");
             Catalogo catalogo = new Catalogo();
             SqlDataReader reader = null;
             SqlConnection myConnection = new SqlConnection();
@@ -39,7 +42,8 @@ namespace ComandasCityMarket.Controllers
                 List<Modificador> modificadores = new List<Modificador>();
                 try//EL SIGUEINTE BLOQUE ES PARA EXTRAER LAS CATEGORIAS
                 {
-                    SqlCommand command = new SqlCommand("SELECT A.* FROM AGRUPACION_CAT A, RESTAURANT_AGRUP B WHERE B.REST_ID = " + reqCatalogo.rest_id + " AND A.AGRU_PADRE = 0 AND A.AGRU_ID=B.AGRU_ID", myConnection);
+                    //SqlCommand command = new SqlCommand("SELECT A.* FROM AGRUPACION_CAT A, RESTAURANT_AGRUP B WHERE B.REST_ID = " + reqCatalogo.rest_id + " AND A.AGRU_PADRE = 0 AND A.AGRU_ID=B.AGRU_ID", myConnection);
+                    SqlCommand command = new SqlCommand("SELECT A.* FROM AGRUPACION_CAT A WHERE A.AGRU_PADRE = 0", myConnection);
                     reader = command.ExecuteReader();
                     while (reader.Read())
                     {
@@ -55,7 +59,8 @@ namespace ComandasCityMarket.Controllers
                             categoria.hasSubCat = true;
                             //SqlCommand commandFindSub = new SqlCommand("SELECT * FROM AGRUPACION_CAT WHERE AGRU_TIPO = 1 AND AGRU_PADRE = "+categoria.agru_padre, myConnection);
                             //SqlCommand commandFindSub = new SqlCommand("SELECT * FROM AGRUPACION_CAT WHERE AGRU_PADRE = " + categoria.agru_id, myConnection);
-                            SqlCommand commandFindSub = new SqlCommand("SELECT A.* FROM AGRUPACION_CAT A, RESTAURANT_AGRUP B WHERE B.REST_ID = " + reqCatalogo.rest_id + " AND A.AGRU_PADRE = "+ categoria.agru_id+" AND A.AGRU_ID=B.AGRU_ID" , myConnection);
+                            //SqlCommand commandFindSub = new SqlCommand("SELECT A.* FROM AGRUPACION_CAT A, RESTAURANT_AGRUP B WHERE B.REST_ID = " + reqCatalogo.rest_id + " AND A.AGRU_PADRE = "+ categoria.agru_id+" AND A.AGRU_ID=B.AGRU_ID" , myConnection);
+                            SqlCommand commandFindSub = new SqlCommand("SELECT A.* FROM AGRUPACION_CAT A WHERE A.AGRU_PADRE = " + categoria.agru_id , myConnection);
                             
                             SqlDataReader readerSub = commandFindSub.ExecuteReader();
                             List<SubCategoria> listasubCateg = new List<SubCategoria>();
@@ -136,6 +141,7 @@ namespace ComandasCityMarket.Controllers
                 }
                 catch (SqlException exCat)
                 {
+                    log.Error("Error Solicitando el catalogo en SQLException" + exCat.Message);
                     catalogo.success = false;
                     catalogo.message = "ERROR 122" + exCat.Message;
                     return Json(catalogo);
@@ -143,6 +149,7 @@ namespace ComandasCityMarket.Controllers
             }
             catch (Exception e)
             {
+                log.Error("Error Solicitando el catalogo en " + e.Message);
                 catalogo.success = false;//En caso de caer en exception el estado del boleano se envia en falso y en message el detalle del error
                 catalogo.message = "ERROR 168 " + e.Message;
                 return Json(catalogo);
@@ -158,84 +165,112 @@ namespace ComandasCityMarket.Controllers
         [HttpPost]
         public ActionResult appEntrar(Acceso login)
         {
+            log.Info("Solicitando appEntrar");
             RespAcceso respuesta = new RespAcceso();
             try
             {
                 SqlDataReader reader = null;
                 SqlConnection myConnection = new SqlConnection();
+                Empleado emp = null;
+                RestDetalle rest = null;
+                log.Debug("Restaurante " +login.rest_id);
+                log.Debug(" |Validando contraseña " + login.password); // " contra contraseña de restaurant " + ConfigurationManager.AppSettings[login.rest_id].ToString());
+                log.Debug("1= " + ConfigurationManager.AppSettings["1"].ToString());
+                log.Debug("?= " + ConfigurationManager.AppSettings[""+login.rest_id].ToString());
+                string pass = null;
                 try
                 {
-                    myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
-                    myConnection.Open();
-                    //SqlCommand command = new SqlCommand("select * from RESTAURANT a, EMPLEADO b where b.EMPL_COD = " + login.num_empleado + " and a.REST_ID = " + login.rest_id + " and b.EMPL_STAT ='ALTA'", myConnection);
-                    SqlCommand command = new SqlCommand("select (select SUCC_DES from SUCURSAL where SUCC_ID = a.SUCC_ID) as SUCC_DES, * from 	RESTAURANT a, ff_cat_usuario b where b.usr_numempleado = " + login.num_empleado + " and a.REST_ID = " + login.rest_id, myConnection);
-                    reader = command.ExecuteReader();
-                    Empleado emp = null;
-                    RestDetalle rest = null;
-                    while (reader.Read())
-                    {
-                        emp = new Empleado();
-                        rest = new RestDetalle();
-                        rest.rest_des = reader["rest_des"].ToString();
-                        rest.rest_id = Convert.ToInt32(reader["rest_id"].ToString());
-                        rest.succ_id = Convert.ToInt32(reader["succ_id"].ToString());
-                        rest.succ_des = reader["succ_des"].ToString();
-                        /*
-                        emp.empl_apm = reader["empl_apm"].ToString();
-                        emp.empl_app = reader["empl_app"].ToString();
-                        emp.empl_cod = Convert.ToInt32(reader["empl_cod"].ToString());
-                        emp.empl_nom = reader["empl_nom"].ToString();
-                        emp.empl_stat = reader["empl_stat"].ToString();
-                        emp.empl_tipo = reader["empl_tipo"].ToString();
-                        emp.succ_id = Convert.ToInt32(reader["succ_id"].ToString());
-                        */
-                        emp.empl_apm = "";
-                        emp.empl_app = "";
-                        emp.empl_cod = Convert.ToInt32(reader["usr_numempleado"].ToString());
-                        emp.empl_nom = reader["usr_nombre"].ToString();
-                        emp.empl_stat = "ALTA";
-                        emp.empl_tipo = "MESERO";
-                        emp.succ_id = Convert.ToInt32(reader["succ_id"].ToString());
-                    }//end while
-                    if (emp != null && rest != null)
-                    {
-                        respuesta.success = true;
-                        respuesta.message = "OK";
-                        respuesta.restaurant = rest;
-                        respuesta.empleado = emp;
-                    }
-                    else
-                    {
-                        respuesta.success = false;
-                        respuesta.message = "NO EXISTE RELACION EMPLEADO - RESTAURANT";
-                        respuesta.restaurant = rest;
-                        respuesta.empleado = emp;
-                    }
-
+                    pass = ConfigurationManager.AppSettings["" + login.rest_id].ToString();
+                }catch(Exception exrr){
+                    log.Error("ERROR VALIDANDO CONTRASEÑA EN "+ exrr.Message);
                 }
-                catch (SqlException sqlExc)
-                {
+                if(pass== null){
+                    log.Debug("Configuracion de contraseña, incorrecta");
                     respuesta.success = false;
-                    respuesta.message = "ERROR " + sqlExc.Message;
-                    return Json(respuesta);
+                    respuesta.message = "CONFIGURACION DE CONTRASEÑA, INCORRECTA";
+                    respuesta.restaurant = rest;
+                    respuesta.empleado = emp;
                 }
-                finally
+                else if ( pass == login.password)
                 {
-                    myConnection.Close();
+                    log.Debug("Contraseña Valida");
+                    try
+                    {
+                        myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
+                        myConnection.Open();
+                        //SqlCommand command = new SqlCommand("select * from RESTAURANT a, EMPLEADO b where b.EMPL_COD = " + login.num_empleado + " and a.REST_ID = " + login.rest_id + " and b.EMPL_STAT ='ALTA'", myConnection);
+                        SqlCommand command = new SqlCommand("select (select SUCC_DES from SUCURSAL where SUCC_ID = a.SUCC_ID) as SUCC_DES, * from 	RESTAURANT a, ff_cat_usuario b where b.usr_numempleado = " + login.num_empleado + " and a.REST_ID = " + login.rest_id, myConnection);
+                        reader = command.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            emp = new Empleado();
+                            rest = new RestDetalle();
+                            rest.rest_des = reader["rest_des"].ToString();
+                            rest.rest_id = Convert.ToInt32(reader["rest_id"].ToString());
+                            rest.succ_id = Convert.ToInt32(reader["succ_id"].ToString());
+                            rest.succ_des = reader["succ_des"].ToString();
+                            emp.empl_apm = "";
+                            emp.empl_app = "";
+                            emp.empl_cod = Convert.ToInt32(reader["usr_numempleado"].ToString());
+                            emp.empl_nom = reader["usr_nombre"].ToString();
+                            emp.empl_stat = "ALTA";
+                            emp.empl_tipo = "MESERO";
+                            emp.succ_id = Convert.ToInt32(reader["succ_id"].ToString());
+                        }//end while
+                        if (emp != null && rest != null)
+                        {
+                            respuesta.success = true;
+                            respuesta.message = "OK";
+                            respuesta.restaurant = rest;
+                            respuesta.empleado = emp;
+                        }
+                        else
+                        {
+                            respuesta.success = false;
+                            respuesta.message = "CONTRASEÑA INVÁLIDA";
+                            respuesta.restaurant = rest;
+                            respuesta.empleado = emp;
+                        }
+
+                    }
+                    catch (SqlException sqlExc)
+                    {
+                        log.Error("Error en SQLException appEntrar en " + sqlExc.Message);
+                        respuesta.success = false;
+                        respuesta.message = "ERROR " + sqlExc.Message;
+                        return Json(respuesta);
+                    }
+                    finally
+                    {
+                        myConnection.Close();
+                    }
+                }
+                else
+                {
+                    log.Debug("Contraseña incorrecta");
+                    respuesta.success = false;
+                    respuesta.message = "CONTRASEÑA INVÁLIDA";
+                    respuesta.restaurant = rest;
+                    respuesta.empleado = emp;
                 }
                 //fin try-catch SQL 
             }
             catch (Exception ex)
             {
+                log.Error("Error solicitando appEntrar en "+ ex.Message);
                 respuesta.success = false;
                 respuesta.message = "ERROR " + ex.Message;
                 return Json(respuesta);
             }//Fin Try-catch General
             return Json(respuesta);
         }//END ENTRAR
+
+
         [HttpPost]
         public ActionResult getMesas(ReqDeleteRestaurant rest)
         {
+            log.Info("Solicitando getMesas");
             RespMesas mesas = new RespMesas();
             try
             {
@@ -276,12 +311,14 @@ namespace ComandasCityMarket.Controllers
                 }
                 catch (SqlException exc)
                 {
+                    log.Error("Error  SQLExc solicitando getMesas en " + exc.Message);
                     mesas.success = false;
                     mesas.message = "ERROR " + exc.Message;
                 }
             }
             catch (Exception ex)
             {
+                log.Error("Error solicitando getMesas en " + ex.Message);
                 mesas.success = false;
                 mesas.message = "ERROR " + ex.Message;
             }
@@ -290,6 +327,7 @@ namespace ComandasCityMarket.Controllers
         [HttpPost]
         public ActionResult getOrdenesActivas(Acceso acceso)
         {
+            log.Info("Solicitando getOrdenesActivas");
             RespOrdenesActivas ordenesActivas = new RespOrdenesActivas();
             try
             {
@@ -300,7 +338,8 @@ namespace ComandasCityMarket.Controllers
                 {
                     myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                     myConnection.Open();
-                    SqlCommand command = new SqlCommand("select a.ORDN_ID,a.ORDN_NPER, a.ORDN_IMPTOT, a.ORDN_STAT, a.MESA_ID, 		(select d.ordn_hmov from ORDEN_CTRL d where d.ORDN_ID = a.ORDN_ID) as ORDN_HMOV,		(select c.MESA_cve from MESA c where c.MESA_ID = a.MESA_ID) as MESA_CVE		  from orden a where a.ORDN_MESE= "+acceso.num_empleado+" and a.ORDN_STAT= 'INIC' or a.ORDN_STAT = 'CAMM'", myConnection);
+                    //SqlCommand command = new SqlCommand("select a.ORDN_ID,a.ORDN_NPER, a.ORDN_IMPTOT, a.ORDN_STAT, a.MESA_ID, 		(select d.ordn_hmov from ORDEN_CTRL d where d.ORDN_ID = a.ORDN_ID) as ORDN_HMOV,		(select c.MESA_cve from MESA c where c.MESA_ID = a.MESA_ID) as MESA_CVE		  from orden a where a.ORDN_MESE= "+acceso.num_empleado+" and a.ORDN_STAT= 'INIC' or a.ORDN_STAT = 'CAMM'", myConnection);
+                    SqlCommand command = new SqlCommand("select a.ORDN_ID,a.ORDN_NPER, a.ORDN_IMPTOT, a.ORDN_STAT, a.MESA_ID, 		(select d.ordn_hmov from ORDEN_CTRL d where d.ORDN_ID = a.ORDN_ID) as ORDN_HMOV,		(select c.MESA_cve from MESA c where c.MESA_ID = a.MESA_ID) as MESA_CVE		  from orden a where a.ORDN_MESE= " + acceso.num_empleado + " and (select c.rest_id from MESA c where c.MESA_ID =a.MESA_ID) = "+acceso.rest_id + " and a.ORDN_STAT= 'INIC' or a.ORDN_STAT = 'CAMM'", myConnection);
                     reader = command.ExecuteReader();
                     while (reader.Read())
                     {
@@ -319,6 +358,7 @@ namespace ComandasCityMarket.Controllers
                 }
                 catch (SqlException sqlex)
                 {
+                    log.Error("Error en SQLException getOrdenesActivas en " + sqlex.Message);
                     ordenesActivas.success = false;
                     ordenesActivas.message = "ERROR " + sqlex;
                     return Json(ordenesActivas);
@@ -330,6 +370,7 @@ namespace ComandasCityMarket.Controllers
             }
             catch (Exception exc)
             {
+                log.Error("Error  getOrdenesActivas en " + exc.Message);
                 ordenesActivas.success = false;
                 ordenesActivas.message = "ERROR " + exc.Message;
                 return Json(ordenesActivas);
@@ -341,6 +382,7 @@ namespace ComandasCityMarket.Controllers
         [HttpPost]
         public ActionResult getRestaurantes(ReqEmpleado req)
         {
+            log.Info("Solicitando getRestaurantes");
             RespRestaurant respuestaRestaurantes = new RespRestaurant();
             try
             {
@@ -371,6 +413,7 @@ namespace ComandasCityMarket.Controllers
                 }
                 catch (SqlException exc)
                 {
+                    log.Error("Error en getRestaurantes SQLException en " + exc.Message);
                     respuestaRestaurantes.success = false;
                     respuestaRestaurantes.message += "ERROR " + exc.Message;
                     return Json(respuestaRestaurantes);
@@ -382,6 +425,7 @@ namespace ComandasCityMarket.Controllers
             }
             catch (Exception ex)
             {
+                log.Error("Error en getRestaurantes Exception en " + ex.Message);
                 respuestaRestaurantes.success = false;
                 respuestaRestaurantes.message += "ERROR " + ex.Message;
                 return Json(respuestaRestaurantes);
@@ -393,63 +437,90 @@ namespace ComandasCityMarket.Controllers
         [HttpPost]
         public ActionResult newOrden(NuevaOrden newOrden)
         {
+            log.Info("Solicitando newOrden");
             RespNuevaOrden resp = new RespNuevaOrden();
             SqlConnection myConnection = new SqlConnection();
+            SqlDataReader reader = null;
             try
             {
+                
+                
                 myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                 myConnection.Open();
-                SqlCommand command = new SqlCommand("INSERT INTO ORDEN (ORDN_NPER, ORDN_IMPTOT, ORDN_STAT, MESA_ID,ORDN_MESE, ORDN_MESEORIG ) VALUES (@NPER,0, 'INIC',@MESA,@MESE,@MESE);  SELECT CAST(SCOPE_IDENTITY() AS INT )", myConnection);
-                command.Parameters.AddWithValue("@NPER", newOrden.ordn_nper);
-                command.Parameters.AddWithValue("@MESA", newOrden.mesa_id);
-                command.Parameters.AddWithValue("@MESE", newOrden.ordn_mese);
-                
-                int idorden = (int)command.ExecuteScalar();
-                if (idorden != 0)
+                log.Debug("New Orden Conexion abierta, validando mesa " + newOrden.mesa_id);
+                SqlCommand command = new SqlCommand("select COUNT(*) as contador from MESA where MESA_ID= " + newOrden.mesa_id + " and MESA_STAT = 'ALTA'", myConnection);
+                log.Debug("-0");
+                reader = command.ExecuteReader();
+                log.Debug("-1");
+                int iValidaMesa = 0;
+                log.Debug("-2");
+                while (reader.Read())
                 {
-                    DateTime fecha = DateTime.Now;
-                    int iFecha = Convert.ToInt32(""+fecha.Year+""+fecha.Month +""+fecha.Day);
-                    int iHora = Convert.ToInt32(fecha.Hour + ""+fecha.Minute);                    
-                    command = new SqlCommand("INSERT INTO ORDEN_CTRL (ORDN_ID, ORDN_STAT, EMPL_COD, ORDN_FMOV, ORDN_HMOV, ORDN_OBSV) VALUES (@IDORD,'INIC', @MESE,@FECH,@HORA,@OBSV)", myConnection);
-                    resp.ordn_id = idorden;
-                    command.Parameters.AddWithValue("@IDORD", idorden);
-                    command.Parameters.AddWithValue("@MESE", newOrden.ordn_mese);
-                    command.Parameters.AddWithValue("@FECH", iFecha);
-                    command.Parameters.AddWithValue("@HORA", iHora);
-                    command.Parameters.AddWithValue("@OBSV", newOrden.ordn_obsv);
-                    if (0 < command.ExecuteNonQuery())
-                    {
-                        command = new SqlCommand("UPDATE MESA SET MESA_STAT = 'BAJA' WHERE MESA_STAT ='ALTA' AND MESA_ID = @MESA; ", myConnection);
-                        command.Parameters.AddWithValue("@MESA", newOrden.mesa_id);
+                    iValidaMesa = Convert.ToInt32(reader["contador"].ToString());
+                    log.Info("VALIDANDO MESA |"+iValidaMesa);
+                }
 
+                if ( iValidaMesa>= 1)
+                {
+                    log.Debug("Mesa Valida... ");
+                    command = new SqlCommand("INSERT INTO ORDEN (ORDN_NPER, ORDN_IMPTOT, ORDN_STAT, MESA_ID,ORDN_MESE, ORDN_MESEORIG ) VALUES (@NPER,0, 'INIC',@MESA,@MESE,@MESE);  SELECT CAST(SCOPE_IDENTITY() AS INT )", myConnection);
+                    command.Parameters.AddWithValue("@NPER", newOrden.ordn_nper);
+                    command.Parameters.AddWithValue("@MESA", newOrden.mesa_id);
+                    command.Parameters.AddWithValue("@MESE", newOrden.ordn_mese);
+
+                    int idorden = (int)command.ExecuteScalar();
+                    if (idorden != 0)
+                    {
+                        DateTime fecha = DateTime.Now;
+                        int iFecha = Convert.ToInt32("" + fecha.Year + "" + fecha.Month + "" + fecha.Day);
+                        int iHora = Convert.ToInt32(fecha.Hour + "" + fecha.Minute);
+                        command = new SqlCommand("INSERT INTO ORDEN_CTRL (ORDN_ID, ORDN_STAT, EMPL_COD, ORDN_FMOV, ORDN_HMOV, ORDN_OBSV) VALUES (@IDORD,'INIC', @MESE,@FECH,@HORA,@OBSV)", myConnection);
+                        resp.ordn_id = idorden;
+                        command.Parameters.AddWithValue("@IDORD", idorden);
+                        command.Parameters.AddWithValue("@MESE", newOrden.ordn_mese);
+                        command.Parameters.AddWithValue("@FECH", iFecha);
+                        command.Parameters.AddWithValue("@HORA", iHora);
+                        command.Parameters.AddWithValue("@OBSV", newOrden.ordn_obsv);
                         if (0 < command.ExecuteNonQuery())
                         {
-                            resp.success = true;
-                            resp.message = "OK";
+                            command = new SqlCommand("UPDATE MESA SET MESA_STAT = 'BAJA' WHERE MESA_STAT ='ALTA' AND MESA_ID = @MESA; ", myConnection);
+                            command.Parameters.AddWithValue("@MESA", newOrden.mesa_id);
+
+                            if (0 < command.ExecuteNonQuery())
+                            {
+                                resp.success = true;
+                                resp.message = "OK";
+                            }
+                            else
+                            {
+                                resp.success = false;
+                                resp.message = "MESA NO ACTUALIZADA";
+                            }
                         }
                         else
                         {
                             resp.success = false;
-                            resp.message = "MESA NO ACTUALIZADA";
+                            resp.message = "ORDEN_CTRL NO ACTUALIZADA";
                         }
                     }
                     else
                     {
                         resp.success = false;
-                        resp.message = "ORDEN_CTRL NO ACTUALIZADA";
+                        resp.message = "NO SE CREO NUEVA ORDEN";
                     }
+
+                    command.Parameters.Clear();
                 }
                 else
                 {
+                    log.Debug("Mesa ocupada");
                     resp.success = false;
-                    resp.message = "NO SE CREO NUEVA ORDEN";
-                }
-
-                command.Parameters.Clear();
-
+                    resp.message = "MESA OCUPADA";
+                }//fin iValidaMesa
             }
             catch (SqlException ex)
             {
+                log.Error("Error newOrden en "+ex.Message);
                 resp.success = false;
                 resp.message = "ERROR " + ex.Message;
                 return Json(resp);
@@ -463,10 +534,12 @@ namespace ComandasCityMarket.Controllers
         [HttpPost]
         public ActionResult newComanda( newComanda newcomand)
         {
+            log.Info("Solicitando newComanda de orden "+newcomand.ordn_id);
             SqlDataReader reader = null;
             Respuesta resp = new Respuesta();
             SqlConnection myConnection = new SqlConnection();
             decimal imptot = 0;
+            int idComanda=0;
             try
             {
                 myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
@@ -475,7 +548,7 @@ namespace ComandasCityMarket.Controllers
                 command.Parameters.AddWithValue("@ORDN", newcomand.ordn_id);
 
                 resp.message += "-1";
-                int idComanda = (int)command.ExecuteScalar();
+                idComanda = (int)command.ExecuteScalar();
                 if (0 < idComanda)
                 {
                     resp.message += "-2";
@@ -514,27 +587,29 @@ namespace ComandasCityMarket.Controllers
                                 resp.message += "-9";
                                 if (artOrd.hasModif == true)
                                 {
-                                    resp.message += "-10";
-                                    command = new SqlCommand("INSERT INTO ORDENART_MODIF (ORDN_ID, COMA_ID, ART_EAN, AGRU_ID, AGRU_CONSEC) VALUES (@ORDN_ID,@COMA_ID,@ART_EAN,@AGRU_ID,@AGRU_CONSEC)", myConnection);
-                                    command.Parameters.AddWithValue("@ORDN_ID", newcomand.ordn_id);
-                                    command.Parameters.AddWithValue("@COMA_ID", idComanda);
-                                    command.Parameters.AddWithValue("@ART_EAN", artOrd.art_ean);
-                                    command.Parameters.AddWithValue("@AGRU_ID", artOrd.art_ean);
-                                    command.Parameters.AddWithValue("@AGRU_CONSEC", artOrd.art_ean);
-                                    if (0 < command.ExecuteNonQuery())
+                                    foreach (Modificadoresart modiff in artOrd.modificadores)
                                     {
-                                        resp.message += "-11|";
+                                        //resp.message += "-10";
+                                        command = new SqlCommand("INSERT INTO ORDENART_MODIF (ORDN_ID, COMA_ID, ART_EAN, AGRU_ID, AGRU_CONSEC) VALUES (@ORDN_ID,@COMA_ID,@ART_EAN,@AGRU_ID,@AGRU_CONSEC)", myConnection);
+                                        command.Parameters.AddWithValue("@ORDN_ID", newcomand.ordn_id);
+                                        command.Parameters.AddWithValue("@COMA_ID", idComanda);
+                                        command.Parameters.AddWithValue("@ART_EAN", artOrd.art_ean);
+                                        command.Parameters.AddWithValue("@AGRU_ID", modiff.agru_id);
+                                        command.Parameters.AddWithValue("@AGRU_CONSEC", modiff.agru_consec);
+                                        if (0 < command.ExecuteNonQuery())
+                                        {
+                                            resp.message += "-11|||";
 
-                                        resp.success = true;
-                                        resp.message += "OK";
-                                    }
+                                            resp.success = true;
+                                            resp.message += "532: OK";
+                                        }
+                                    }//fin foreach
                                 }
                                 else
                                 {
                                     resp.success = true;
-                                    resp.message += "OK";
+                                    resp.message += "539: OK";
                                 }
-                                
                             }
                             else
                             {
@@ -550,17 +625,23 @@ namespace ComandasCityMarket.Controllers
                         {
                             imptot += Convert.ToDecimal(reader["ordn_imptot"].ToString());
                         }
-
                         command = new SqlCommand("UPDATE ORDEN SET ordn_imptot =@PRECTOT WHERE ORDN_ID =@IDO", myConnection);
                         command.Parameters.AddWithValue("@IDO", newcomand.ordn_id);
                         command.Parameters.AddWithValue("@PRECTOT", imptot);
                         if (0 < command.ExecuteNonQuery())
                         {
                             resp.success = true;
-                            resp.message += " OK";
+                            resp.message += "567: OK";
                          
                         }
-                        try { printComanda(newcomand); }catch(Exception ext){}
+                        try {
+                            resp.message += " | PRINT";
+                            printComanda(newcomand);
+                            resp.message += " | PRINTGOOD";
+                        }catch(Exception ext){
+                            resp.success = false;
+                            resp.message += "Error PRINT="+ext.Message;
+                        }
                     }
                     else
                     {
@@ -579,8 +660,9 @@ namespace ComandasCityMarket.Controllers
             }
             catch (Exception ex)
             {
+                log.Error("Error en newComanda en " + ex.Message);
                 resp.success = false;
-                resp.message += "ERROR " + ex.Message;
+                resp.message += "ERROR a. " + ex.Message;
                 return Json(resp);
             }
             finally
@@ -589,7 +671,8 @@ namespace ComandasCityMarket.Controllers
             }
             return Json(resp);
         }//END COMANDA
-        [HttpPost]
+        
+        /*[HttpPost]
         public ActionResult testID()
         {
             Respuesta resp =  new Respuesta();
@@ -610,10 +693,12 @@ namespace ComandasCityMarket.Controllers
                 myConnection.Close();
             }
             return Json(resp);
-        }
+        }*/
+        
         [HttpPost]
         public ActionResult consolidarOrdenes(ConsolidaOrdenes listaOrdenesCons)
         {
+            log.Info("Solicitando consolidarOrdenes");
             Respuesta resp = new Respuesta();
             SqlDataReader reader = null;
             SqlCommand command = null;
@@ -710,6 +795,7 @@ namespace ComandasCityMarket.Controllers
                 
             }
             catch(Exception ext){
+                log.Error("Error en consolidarOrdenes en " + ext.Message);
                 resp.success = false;
                 resp.message = "ERROR " + ext.Message;
                 return Json(resp);
@@ -722,8 +808,8 @@ namespace ComandasCityMarket.Controllers
         [HttpPost]
         public ActionResult traspasoCuentas(TraspasoOrrdenesMese trasp)
         {
+            log.Info("Solicitando traspasoCuentas de " + trasp.mese_orig + " a " + trasp.mese_nuevo);
             Respuesta resp = new Respuesta();
-            SqlDataReader reader = null;
             SqlCommand command = null;
             SqlConnection myConnection = new SqlConnection();
             try
@@ -751,6 +837,7 @@ namespace ComandasCityMarket.Controllers
                     }
                 }
             }catch(Exception ex){
+                log.Error("Error en traspasoCuentas en "+ex.Message);
                 resp.success = false;
                 resp.message = "ERROR " + ex.Message;
             }finally{
@@ -758,9 +845,11 @@ namespace ComandasCityMarket.Controllers
             }
             return Json(resp);
         }
+        
         [HttpPost]
         public ActionResult getProductosOrden(OrdenRefer orden)
         {
+            log.Info("Solicitando getProductosOrden de orden "+orden.ordn_id);
             DetalleOrdenes detalledeOrden = new DetalleOrdenes();
             SqlDataReader reader = null;
             SqlCommand command = null;
@@ -790,6 +879,7 @@ namespace ComandasCityMarket.Controllers
             }
             catch (Exception ex)
             {
+                log.Error("Error en getProductosOrden en "+ex.Message);
                 detalledeOrden.success = false;
                 detalledeOrden.message = "ERROR " + ex.Message;
             }
@@ -802,6 +892,7 @@ namespace ComandasCityMarket.Controllers
 
         [HttpPost]
         public ActionResult getRestoOrdenes(ReqDeleteRestaurant rest) {
+            log.Info("Solicitando getRestoOrdenes en restaurant "+rest.rest_id);
             RespOrdenDescripcionCorta resp = new RespOrdenDescripcionCorta();
             SqlDataReader reader = null;
             SqlConnection myConnection = new SqlConnection();
@@ -809,8 +900,6 @@ namespace ComandasCityMarket.Controllers
             {
                 myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                 myConnection.Open();
-                
-
                 //SqlCommand command = new SqlCommand("select a.ordn_id, b.empl_nom,b.empl_app, c.mesa_cve, a.ordn_imptot, a.ordn_nper from orden a, empleado b, mesa c where a.mesa_id = c.mesa_id and a.ordn_mese = b.empl_cod and c.rest_id = @REST and a.ordn_stat <> 'FINC' ", myConnection);
                 //command.Parameters.AddWithValue("@REST", rest.rest_id);
 
@@ -839,6 +928,7 @@ namespace ComandasCityMarket.Controllers
             }
             catch(Exception ex)
             {
+                log.Error("Error en getRestoOrdenes en " + ex.Message);
                 resp.success = false;
                 resp.message = "ERROR "+ex.Message;
                 return Json(resp);
@@ -849,8 +939,9 @@ namespace ComandasCityMarket.Controllers
             }
             return Json(resp);
         }
+
         [HttpPost]
-        public ActionResult finOrden(RefOrden orden)
+        public ActionResult isValidOrden(ValidaOrdenMesero ordenmesero)
         {
             Respuesta resp = new Respuesta();
             SqlDataReader reader = null;
@@ -859,7 +950,53 @@ namespace ComandasCityMarket.Controllers
             {
                 myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                 myConnection.Open();
-                SqlCommand command = new SqlCommand("UPDATE ORDEN SET ORDN_STAT = 'FINC' WHERE ORDN_ID = @ORDEN", myConnection);
+                SqlCommand command = new SqlCommand(" SELECT COUNT(*) as contar FROM ORDEN where ORDN_ID = " +ordenmesero.ordn_id+" and ORDN_MESE = "+ordenmesero.ordn_mese, myConnection);
+                reader = command.ExecuteReader();
+                int iContador = 0;
+                while (reader.Read())
+                {
+                    iContador = Convert.ToInt32(reader["contar"].ToString());
+                }
+                if (0 < iContador)
+                {
+                    resp.message = "OK";
+                    resp.success = true;
+                }
+                else
+                {
+                    resp.message = "ORDEN NO PERTENECE A MESERO";
+                    resp.success = false;
+                }
+
+            }
+            catch(Exception ex){
+                resp.message ="Error: "+ ex.Message;
+                resp.success = false;
+            }
+            return Json(resp);
+        }
+
+        [HttpPost]
+        public ActionResult finOrden(RefOrden orden)
+        {
+            log.Info("Solicitando finOrden de orden " + orden.ordn_id);
+            string sNombreRest = null;
+            Respuesta resp = new Respuesta();
+            SqlDataReader reader = null;
+            SqlConnection myConnection = new SqlConnection();
+            try
+            {
+                myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
+                myConnection.Open();
+                SqlCommand command = new SqlCommand("select REST_DES from  RESTAURANT where REST_ID =(select rest_id from MESA where MESA_id = (select MESA_ID from ORDEN where ORDN_ID= " +orden.ordn_id+"))", myConnection);
+                log.Debug("Obteniendo Informacion de Base-Restaurante");
+                reader = command.ExecuteReader();
+                while(reader.Read()){
+                    sNombreRest = reader["REST_DES"].ToString();
+                    sNombreRest = sNombreRest.Replace(" ", "");
+                    log.Debug("Base de Orden =" + sNombreRest);
+                }
+                command = new SqlCommand("UPDATE ORDEN SET ORDN_STAT = 'FINC' WHERE ORDN_ID = @ORDEN", myConnection);
                 command.Parameters.AddWithValue("@ORDEN", orden.ordn_id);
                 if (0 < command.ExecuteNonQuery())
                 {
@@ -874,19 +1011,21 @@ namespace ComandasCityMarket.Controllers
                             command = new SqlCommand(" select * from orden_articulo where ordn_id = " + orden.ordn_id, myConnection);
                             reader = command.ExecuteReader();
                             while (reader.Read())
-                            {
-                                command = new SqlCommand("insert into ff_venta_local (vtaloc_fecha, vtaloc_cliente, vtaloc_folio, vtaloc_upc, vtaloc_cantidad, vtaloc_imp) values (GETDATE(),16, 2, @artean, @cant,1)", myConnection);
-                                command.Parameters.AddWithValue("@artean", reader["art_ean"].ToString());
-                                command.Parameters.AddWithValue("@cant", reader["ordn_cant"].ToString());
-                                if (0 < command.ExecuteNonQuery())
+                            {//INSERTA EN LA DB CORRESPONDIENTE LA VENTA
+
+                                if (insertaVenta(reader, sNombreRest))
                                 {
                                     resp.success = true;
-                                    resp.message += "OK";
-                                    
+                                    resp.message = "OK";
+                                }
+                                else
+                                {
+                                    resp.success = false;
+                                    resp.message = "ERROR INSERTANDO EN BASE DE RESTAURANT";
+                                    return Json(resp);
                                 }
                             }                            
-                            resp.success = true;
-                            resp.message = "OK";
+                            
                         }
                         else
                         {
@@ -909,6 +1048,7 @@ namespace ComandasCityMarket.Controllers
                     return Json(resp);
                 }
             }catch(Exception ex){
+                log.Error("Error en finOrden en " + ex.Message);
                 resp.success = false;
                 resp.message ="ERROR "+ex.Message; 
             }
@@ -916,12 +1056,20 @@ namespace ComandasCityMarket.Controllers
             {
                 myConnection.Close();
             }
-            try { printOrden(orden); }catch(Exception ex){}
+            try { 
+                printOrden(orden); 
+            }
+            catch(Exception ex)
+            {
+                log.Error("Error printOrden en " + ex.Message);
+                log.Error(ex.StackTrace);
+            }
             return Json(resp);
         }
 
         public void printOrden(RefOrden ordn)
         {
+            log.Info("Solicitando printOrden de orden " + ordn.ordn_id);
             SqlDataReader reader = null;
             SqlConnection myConnection = new SqlConnection();
             SqlCommand command = null;
@@ -929,70 +1077,136 @@ namespace ComandasCityMarket.Controllers
             PrintDialog pd = new PrintDialog();
             pdoc = new PrintDocument();
             string sNombreImpresora = "";
+            int iubicConsecOrden = 0;
+            int irestOrden =0;
             try
             {
                 myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
                 myConnection.Open();
-                command = new SqlCommand("select top 1 IMPR_CONF from impresora", myConnection);
+                command = new SqlCommand("select (select MESA.UBIC_CONSEC from MESA where MESA.MESA_ID = ORDEN.MESA_ID) as UBIC_CONSEC, (select MESA.REST_ID FROM MESA  where MESA.MESA_ID = ORDEN.MESA_ID) as REST_ID from ORDEN where ORDEN.ORDN_ID =" + ordn.ordn_id, myConnection);
                 reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    sNombreImpresora = reader["IMPR_CONF"].ToString();
-                }
+                    iubicConsecOrden = Convert.ToInt32(reader["UBIC_CONSEC"].ToString());
+                    irestOrden = Convert.ToInt32(reader["REST_ID"].ToString());
+                }// 
+
+                command = new SqlCommand("select top 1 impr_conf from IMPRESORA where IMPRESORA.UBIC_CONSEC = " + iubicConsecOrden + " OR IMPRESORA.REST_ID=" + irestOrden, myConnection);
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    sNombreImpresora = reader["impr_conf"].ToString();
+                }//fin while
             }
-            catch (Exception ex) { }
-            finally { myConnection.Close(); }
+            catch (Exception ex) {
+                log.Error("Error en printOrden " + ex.Message);
+            }
+            finally {
+                myConnection.Close(); 
+            }
             pdoc.PrinterSettings.PrinterName = sNombreImpresora;
             PrinterSettings ps = new PrinterSettings();
             Font font = new Font(sFont, 11);
-
-
             PaperSize psize = new PaperSize("Custom", 1000, 20);
             ps.DefaultPageSettings.PaperSize = psize;
-
             pd.Document = pdoc;
             pd.Document.DefaultPageSettings.PaperSize = psize;
-            pdoc.PrintPage += (sender, e) => pdoc_PrintPageOrden(e, ordn);
-
-            pdoc.Print();
-        }
-
-        
+            try
+            {
+                pdoc.PrintPage += (sender, e) => pdoc_PrintPageOrden(e, ordn);
+                pdoc.Print();
+            }catch(Exception ex){
+                log.Error("Error en printOrden en " + ex.Message);
+            }
+        }//fin PrintOrdn 
         public void printComanda(newComanda listaOrdenesArts)
         {
+            log.Info("Solicitando PrintComanda de " + listaOrdenesArts.ordn_id);
             SqlDataReader reader = null;
             SqlConnection myConnection = new SqlConnection();
             SqlCommand command = null;
-            PrintDocument pdoc = null;
-            PrintDialog pd = new PrintDialog();
-            pdoc = new PrintDocument();
-            string sNombreImpresora = "";
-            try
-            {
-                myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
-                myConnection.Open();
-                command = new SqlCommand("select top 1 IMPR_CONF from impresora", myConnection);
-                reader = command.ExecuteReader();
-                while (reader.Read())
+            
+            var queryDivisionImpresoras = from OrdenArticulo in listaOrdenesArts.ordenarticulo group OrdenArticulo by OrdenArticulo.tipp_id;
+            foreach (var grupodeComandas in queryDivisionImpresoras)
+            { 
+                int llavetipp = grupodeComandas.Key;
+                log.Info("PrintComanda => Agrupando las comandas por tipo " + llavetipp);
+                PrintDocument pdoc = null;
+                PrintDialog pd = new PrintDialog();
+                pdoc = new PrintDocument();
+                string sNombreImpresora = "";
+                string sDesImpresora = "";
+                int iubicConsecOrden = 0;
+                int irestOrden = 0;
+                try
                 {
-                    sNombreImpresora = reader["IMPR_CONF"].ToString();
+                    int imprcount = 0;
+                    myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
+                    myConnection.Open();
+                    log.Debug("Obteniendo ubicacion y restaurant");
+                    command = new SqlCommand("select (select MESA.UBIC_CONSEC from MESA where MESA.MESA_ID = ORDEN.MESA_ID) as UBIC_CONSEC, (select MESA.REST_ID FROM MESA  where MESA.MESA_ID = ORDEN.MESA_ID) as REST_ID from ORDEN where ORDEN.ORDN_ID =" + listaOrdenesArts.ordn_id, myConnection);
+                    reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        iubicConsecOrden = Convert.ToInt32(reader["UBIC_CONSEC"].ToString());
+                        irestOrden = Convert.ToInt32(reader["REST_ID"].ToString());
+                        log.Debug("Ubicacion=" + iubicConsecOrden + " Restaurant = " + irestOrden);
+                    }// 
+
+                    command = new SqlCommand("select impr_conf, impr_des  from IMPRESORA where TIPP_ID = " + llavetipp + " and REST_ID = " + irestOrden, myConnection);
+                    reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        sNombreImpresora = reader["IMPR_CONF"].ToString();
+                        sDesImpresora = reader["IMPR_DES"].ToString();
+                        log.Info("Mandando a imprimir por tipo de Producto, a impresora "+sNombreImpresora);
+                        imprcount++;
+                    }
+                    if(sNombreImpresora.Length<1){
+                        log.Info("No existe impresora para tipo "+llavetipp + " buscando por ubicacion y restaurante");
+
+
+                        command = new SqlCommand("select top 1 impr_conf, impr_des from IMPRESORA where IMPRESORA.UBIC_CONSEC = " + iubicConsecOrden + " OR IMPRESORA.REST_ID=" + irestOrden, myConnection);
+                        reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            sNombreImpresora = reader["impr_conf"].ToString();
+                            sDesImpresora = reader["IMPR_DES"].ToString();
+
+                        }//fin while
+                    }//fin if
+                    newComanda variableArr = new newComanda();
+                    variableArr.ordn_id = listaOrdenesArts.ordn_id;
+                    variableArr.coma_obsv = listaOrdenesArts.coma_obsv;
+                    List<OrdenArticulo> listavarible = new List<OrdenArticulo>();
+                    foreach (var OrdenArticulo in grupodeComandas)
+                    {
+                        log.Info("Agregando una lista variable con los datos... "+ OrdenArticulo.art_ean);
+                        listavarible.Add(OrdenArticulo);
+                    }
+                    variableArr.ordenarticulo = listavarible;
+
+                    pdoc.PrinterSettings.PrinterName = sNombreImpresora;
+                    PrinterSettings ps = new PrinterSettings();
+                    Font font = new Font(sFont, 11);
+
+
+                    PaperSize psize = new PaperSize("Custom", 1000, 20);
+                    ps.DefaultPageSettings.PaperSize = psize;
+
+                    pd.Document = pdoc;
+                    pd.Document.DefaultPageSettings.PaperSize = psize;
+                    pdoc.PrintPage += (sender, e) => pdoc_PrintPage(e, variableArr,  sDesImpresora);
+
+                    pdoc.Print();
+
                 }
-            }catch (Exception ex){}finally{myConnection.Close();}
-            pdoc.PrinterSettings.PrinterName = sNombreImpresora;
-            PrinterSettings ps = new PrinterSettings();
-            Font font = new Font(sFont, 11);
-
-
-            PaperSize psize = new PaperSize("Custom", 1000, 20);
-            ps.DefaultPageSettings.PaperSize = psize;
-
-            pd.Document = pdoc;
-            pd.Document.DefaultPageSettings.PaperSize = psize;
-            pdoc.PrintPage += (sender, e) => pdoc_PrintPage(e, listaOrdenesArts);
-
-            pdoc.Print();
-
-              /*  
+                catch (Exception ex) {
+                    log.Error("Error en PrintComanda  " + ex.Message);
+                }
+                finally { myConnection.Close(); }
+            }//fin foreach
+            /*  
             DialogResult result = pd.ShowDialog();
             if (result == DialogResult.OK)
             {
@@ -1004,20 +1218,19 @@ namespace ComandasCityMarket.Controllers
                     pdoc.Print();
                 }
             }
-            */
-                
-        }
-
-
-        private void pdoc_PrintPage(PrintPageEventArgs e, newComanda lista)
+            */  
+        }//end void
+        private void pdoc_PrintPage(PrintPageEventArgs e, newComanda lista, string impresoraDest)
         {
-
+            log.Info("Solicitando pdoc_PrintPage de "+lista.ordn_id);
             SqlDataReader reader = null;
             SqlConnection myConnection = new SqlConnection();
             SqlCommand command = null;
             Graphics graphics = e.Graphics;
             Font font = new Font(sFont, 9, FontStyle.Bold);
             int iMesaCliente = 0;
+
+            
             try
             {
                 myConnection.ConnectionString = ConfigurationManager.ConnectionStrings["BaseComercial"].ConnectionString;
@@ -1031,6 +1244,7 @@ namespace ComandasCityMarket.Controllers
             }
             catch (Exception extt)
             {
+                log.Error("Error en pdoc_PrintPage en " + extt.Message);
             }
             //float fontHeight = font.GetHeight();
             double fontHeight_d = 8.7;
@@ -1042,7 +1256,9 @@ namespace ComandasCityMarket.Controllers
             //graphics.DrawImage(Image.FromFile(Application.StartupPath +"\\citymark2.png"), 38, 0, 230, 100);
 
             try { graphics.DrawImage(Image.FromFile(".\\citymark2.png"), 38, 0, 230, 100); }
-            catch (Exception ex) { }
+            catch (Exception ex) {
+                log.Error("Error pdoc_PrintPage tratando de agregar imagen en " + ex.Message);
+            }
 
             Offset = Offset + 70;
             String numOrden = "No. de Orden " + lista.ordn_id;
@@ -1070,7 +1286,7 @@ namespace ComandasCityMarket.Controllers
                 List<Modificador> modificadores = new List<Modificador>();
                 string sArticulo = "";
                 string sModificador = "";
-
+                List<string> listaDescripcionModificadores = null;
                 try//EL SIGUEINTE BLOQUE ES PARA EXTRAER LAS CATEGORIAS
                 {
                     command = new SqlCommand("select art_des from articulo where art_ean = " + artOrd.art_ean, myConnection);
@@ -1084,20 +1300,27 @@ namespace ComandasCityMarket.Controllers
                         }
 
                     }
-                    command = new SqlCommand("select agru_des from agrupacion_modif where agru_id = " + artOrd.agru_id + " and agru_consec=" + artOrd.agru_consec, myConnection);
-                    reader = command.ExecuteReader();
-                    while (reader.Read())
+                    listaDescripcionModificadores = new List<string>();
+                    foreach (Modificadoresart modiff in artOrd.modificadores)
                     {
-                        sModificador = reader["agru_des"].ToString();
-                        if (sModificador.Length > 18)
+
+                        command = new SqlCommand("select agru_des from agrupacion_modif where agru_id = " + modiff.agru_id + " and agru_consec=" + modiff.agru_consec, myConnection);
+                        reader = command.ExecuteReader();
+                        while (reader.Read())
                         {
-                            sModificador = sModificador.Substring(0,18);
-                        }
-                    }
+                            sModificador = reader["agru_des"].ToString();
+                            if (sModificador.Length > 18)
+                            {
+                                sModificador = sModificador.Substring(0, 18);
+                            }//end if
+                            listaDescripcionModificadores.Add(sModificador);
+                        }//end while 
+                    }//end foreach
 
                 }
                 catch (Exception exc)
                 {
+                    log.Error("Error en pdoc_PrintPage-Categorias" + exc.Message);
                 }
 
                 Offset = Offset + 10;
@@ -1146,6 +1369,7 @@ namespace ComandasCityMarket.Controllers
                         }
                         catch (Exception tribaes)
                         {
+                            log.Error("Error en pdoc_PrintPage Observaciones "+tribaes.Message);
                             graphics.DrawString("=( " + tribaes, new Font(sFont, (float)7.8, FontStyle.Regular),
                                                        new SolidBrush(Color.Black), 0, startY + Offset);
                             Offset += 10;
@@ -1162,9 +1386,12 @@ namespace ComandasCityMarket.Controllers
                 }
                 if (artOrd.hasModif)
                 {
-                    Offset = Offset + 10;
-                    graphics.DrawString("M: " + sModificador, new Font(sFont, (float)7.8, FontStyle.Regular),
-                        new SolidBrush(Color.Black), startX + 35, startY + Offset);
+                    foreach (string a in listaDescripcionModificadores)
+                    {
+                        Offset = Offset + 10;
+                        graphics.DrawString("M: " + a, new Font(sFont, (float)7.8, FontStyle.Regular),
+                            new SolidBrush(Color.Black), startX + 35, startY + Offset);
+                    }
                 }
                 iCantidadArticulos += artOrd.ordn_cant;
             }//end foreach
@@ -1176,7 +1403,6 @@ namespace ComandasCityMarket.Controllers
                 {
                     sMesero = reader["usr_nombre"].ToString();
                 }
-
                 command = new SqlCommand("select rest_des from restaurant where rest_id = (select rest_id from mesa where mesa_id=(select mesa_id from orden where ordn_id=" + lista.ordn_id + "))", myConnection);
                 reader = command.ExecuteReader();
                 while (reader.Read())
@@ -1186,6 +1412,7 @@ namespace ComandasCityMarket.Controllers
             }
             catch (Exception ex)
             {
+                log.Error("Error en busqueda mesero y restaurante en " + ex.Message);
             }
             finally
             {
@@ -1202,6 +1429,9 @@ namespace ComandasCityMarket.Controllers
                         new SolidBrush(Color.Black), startX - 6, startY + Offset);
             Offset = Offset + 10;
             graphics.DrawString("Origen:" + sRestaurante, new Font(sFont, (float)7.5, FontStyle.Regular),
+                        new SolidBrush(Color.Black), startX - 6, startY + Offset);
+            Offset = Offset + 10;
+            graphics.DrawString("Impresora:" + impresoraDest, new Font(sFont, (float)7.5, FontStyle.Regular),
                         new SolidBrush(Color.Black), startX - 6, startY + Offset);
             Offset = Offset + 25;
 
@@ -1220,11 +1450,9 @@ namespace ComandasCityMarket.Controllers
             Offset = Offset + 20;
 
         }
-
-
         private void pdoc_PrintPageOrden(PrintPageEventArgs e, RefOrden orden)
         {
-            
+            log.Info("Solicitando pdoc_PrintPageOrden de "+orden.ordn_id);
             SqlDataReader reader = null;
             SqlConnection myConnection = new SqlConnection();
             SqlCommand command = null;
@@ -1251,6 +1479,7 @@ namespace ComandasCityMarket.Controllers
             }
             catch (Exception extt)
             {
+                log.Error("Error en pdoc_PrintPageOrden-MesaTienda en " + extt.Message);
             }
             //float fontHeight = font.GetHeight();
             double fontHeight_d = 8.7;
@@ -1259,7 +1488,9 @@ namespace ComandasCityMarket.Controllers
             int startY = 15;
             int Offset = 10;
             try { graphics.DrawImage(Image.FromFile(".\\citymark2.png"), 38, 0, 230, 100); }
-            catch (Exception ex) { }
+            catch (Exception ex) {
+                log.Error("Error en pdoc_PrintPageOrden logo en "+ex.Message);
+            }
 
             Offset = Offset + 80;
             graphics.DrawString(sTienda, new Font(sFont, (float)8.6, FontStyle.Bold),
@@ -1314,7 +1545,7 @@ namespace ComandasCityMarket.Controllers
                     iCantidadArticulos+=ordart.ordn_cant;
                 }
             }catch(Exception excv){
-
+                log.Error("error en busqueda de detalle de orden en "+excv.Message);
             }
             decimal totaltotales = 0;
             foreach (DetalleOrden artOrd in listaDetallesOrden )
@@ -1340,6 +1571,7 @@ namespace ComandasCityMarket.Controllers
                 }
                 catch (Exception exc)
                 {
+                    log.Error("Error en pdoc_PrintPageOrden-sArticulo en "+exc.Message);
                 }
                 if (sArticulo.Length>18)
                 {
@@ -1390,6 +1622,7 @@ namespace ComandasCityMarket.Controllers
             }
             catch (Exception ex)
             {
+                log.Error("Error en pdoc_PrintPageOrden meserorestaurant en "+ex.Message);
             }
             finally
             {
@@ -1430,14 +1663,12 @@ namespace ComandasCityMarket.Controllers
             Offset = Offset + 20;
 
         }
-
         public float CentrarTexto(Graphics graphics, String letter)
         {
             SizeF size = graphics.MeasureString(letter.ToString(), new Font(sFont, (float)8.6, FontStyle.Bold));
             float tamano = (280 - size.Width) / 2;
             return tamano;
         }
-
         public float CentrarImporte(Graphics graphics, String letter)
         {
             SizeF size = graphics.MeasureString(letter.ToString(), new Font(sFont, (float)8.6, FontStyle.Bold));
@@ -1445,7 +1676,6 @@ namespace ComandasCityMarket.Controllers
             float tamano = (280 - size.Width) / (float)ttam;
             return tamano;
         }
-
         public float CentrarTotal(Graphics graphics, String letter)
         {
             SizeF size = graphics.MeasureString(letter.ToString(), new Font(sFont, (float)8.6, FontStyle.Bold));
@@ -1453,7 +1683,36 @@ namespace ComandasCityMarket.Controllers
             float tamano = (280 - size.Width) / (float)ttam;
             return tamano;
         }
-        
+        public Boolean insertaVenta(SqlDataReader reader, string sNombreBase)
+        {
+            Boolean resp = false;
+            log.Info("Insertando venta en base correspondiente");
+            SqlConnection myConnection = new SqlConnection();
+            try
+            {
+                myConnection.ConnectionString = ConfigurationManager.ConnectionStrings[sNombreBase].ConnectionString;
+                myConnection.Open();
+                SqlCommand command = null;
+                command = new SqlCommand("insert into ff_venta_local (vtaloc_fecha, vtaloc_cliente, vtaloc_folio, vtaloc_upc, vtaloc_cantidad, vtaloc_imp) values (GETDATE(),16, 2, @artean, @cant,1)", myConnection);
+                command.Parameters.AddWithValue("@artean", reader["art_ean"].ToString());
+                command.Parameters.AddWithValue("@cant", reader["ordn_cant"].ToString());
+                if (0 < command.ExecuteNonQuery())
+                {
+                    resp = true;
+
+                }
+            }
+            catch (SqlException exc)
+            {
+                log.Error("Error insertando venta en base[ " + sNombreBase + "] = " + exc.Message);
+                myConnection.Close();
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return resp;
+        }
         
         [HttpPost]
         public ActionResult Alive()

@@ -115,4 +115,14 @@ namespace ComandasCityMarket.Models
         public int mese_nuevo { set; get; }
     }
 
+    [Serializable]
+    [DataContract]
+    public class ValidaOrdenMesero
+    {
+        [DataMember]
+        public int ordn_mese { set; get; }
+        [DataMember]
+        public int ordn_id { set; get; }
+    }
+
 }
